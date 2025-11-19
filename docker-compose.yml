@@ -1,0 +1,27 @@
+services:
+  frontend:
+    build: ./app
+    container_name: chronos-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./api
+    container_name: chronos-api
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - DB_CONNECTION=mongodb://mongodb:27017/chronos
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: chronos
