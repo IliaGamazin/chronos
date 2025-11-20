@@ -29,7 +29,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is required'],
         minlength: [8, 'Password must be at least 8 characters'],
-        select: false
+    },
+    pfp_url: {
+        type: String,
+        required: false
     }
 });
 
@@ -45,5 +48,15 @@ userSchema.pre('save', async function  (next) {
         next(error);
     }
 });
+
+userSchema.methods.toDTO = function() {
+    return {
+        id: this._id,
+        login: this.login,
+        email: this.email,
+        full_name: this.full_name,
+        pfp_url: this.pfp_url
+    };
+};
 
 export default mongoose.model('User', userSchema);

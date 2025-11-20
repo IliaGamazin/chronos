@@ -9,13 +9,26 @@ export async function register(req, res, next) {
             req.body.password,
         );
 
-        return res.status(200).json(user);
+        return AuthService.send_auth_response(
+            res, user, "Registration successful", 201
+        );
     }
     catch (error) {
         next(error);
     }
 }
 
-export async function login(req, res) {
-
+export async function login(req, res, next) {
+    try {
+        const user = await AuthService.login(
+            req.body.login,
+            req.body.password
+        );
+        return AuthService.send_auth_response(
+            res, user, "Login successful", 200
+        );
+    }
+    catch (error) {
+        next(error);
+    }
 }

@@ -25,8 +25,8 @@ export const generate_token_pair = (payload) => {
     const refresh_payload = {id: payload.id};
 
     return {
-        access_token: this.generate_access_token(access_payload),
-        refresh_token: this.generate_refresh_token(refresh_payload),
+        access_token: generate_access_token(access_payload),
+        refresh_token: generate_refresh_token(refresh_payload),
     }
 }
 
