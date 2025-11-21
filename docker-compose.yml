@@ -19,7 +19,7 @@ services:
       - mongodb
 
   mongodb:
-    image: mongo:7.0
+    image: mongo
     container_name: mongodb
     ports:
       - "27017:27017"
@@ -29,6 +29,8 @@ services:
       MONGO_INITDB_DATABASE: chronos
     volumes:
       - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
 
 volumes:
   mongodb_data:
+  mongodb_config:
