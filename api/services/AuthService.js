@@ -16,7 +16,6 @@ class AuthService {
             ]
         });
         if (existing) {
-            console.log(existing);
             throw new ConflictError();
         }
 
@@ -33,7 +32,6 @@ class AuthService {
             throw new NotFoundError("No user with login");
         }
 
-        console.log(user);
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) {
             throw new UnauthorizedError("Incorrect password");
