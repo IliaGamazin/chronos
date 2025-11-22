@@ -16,7 +16,7 @@ class AuthService {
             ]
         });
         if (existing) {
-            throw new ConflictError();
+            throw new ConflictError("User with email/login already exists");
         }
 
         const user = await User.create({
