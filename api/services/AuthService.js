@@ -58,7 +58,7 @@ class AuthService {
 
         res.status(status).json({
             message,
-            user: payload,
+            user,
             access_token: tokens.access_token
         })
     }
