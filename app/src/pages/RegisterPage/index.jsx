@@ -17,6 +17,12 @@ const REGISTER_FIELDS = [
     placeholder: 'Enter your email',
   },
   {
+    name: 'full_name',
+    type: 'text',
+    label: 'Full Name',
+    placeholder: 'Enter your full name',
+  },
+  {
     name: 'password',
     type: 'password',
     label: 'Password',
