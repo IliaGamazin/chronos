@@ -2,29 +2,59 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthContext } from '@/context/AuthContext';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
+import DashboardPage from '@/pages/DashboardPage';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import './App.css';
 
 function App() {
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, loading } = useAuthContext();
+
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route
-          path="/"
+          path="/login"
           element={
             isAuthenticated ? (
-              <div className="app">
-                <h1>Chronos</h1>
-                <p>Dashboard coming soon...</p>
-              </div>
+              <Navigate to="/dashboard" replace />
             ) : (
-              <Navigate to="/login" replace />
+              <LoginPage />
             )
           }
         />
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <RegisterPage />
+            )
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

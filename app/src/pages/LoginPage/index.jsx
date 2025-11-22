@@ -6,8 +6,8 @@ const LOGIN_FIELDS = [
   {
     name: 'login',
     type: 'text',
-    label: 'Username or Email',
-    placeholder: 'Enter your username or email',
+    label: 'Username',
+    placeholder: 'Enter your username',
   },
   {
     name: 'password',
