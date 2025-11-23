@@ -57,9 +57,12 @@ class AuthService {
         });
 
         res.status(status).json({
-            message,
-            user,
-            access_token: tokens.access_token
+            success: true,
+            data: {
+                message,
+                user,
+                access_token: tokens.access_token
+            },
         })
     }
 }

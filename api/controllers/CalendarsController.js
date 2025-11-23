@@ -2,7 +2,14 @@ import CalendarsService from "../services/CalendarsService.js";
 
 export const get_calendars = async (req, res, next) => {
     try {
-
+        const calendars = await CalendarsService.get_calendars(
+            req.user.id,
+            req.query.status
+        );
+        return res.status(200).json({
+            success: true,
+            data: calendars
+        });
     }
     catch (error) {
         next(error);
@@ -28,7 +35,10 @@ export const new_calendar = async (req, res, next) => {
             req.body.timezone
         );
 
-        return res.status(201).json(calendar);
+        return res.status(201).json({
+            success: true,
+            data: calendar
+        });
     }
     catch (error) {
         next(error);

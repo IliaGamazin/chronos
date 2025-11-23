@@ -21,6 +21,33 @@ class CalendarsService {
 
         return calendar.toDTO();
     }
+
+    async get_calendars(user_id, status) {
+        let query = {};
+
+        if (status === "owned") {
+            query.author = user_id;
+        }
+        else if (status === "editable") {
+            query.editors = user_id;
+        }
+        else if (status === "followed") {
+            query.followers = user_id;
+        }
+        else {
+            query.$or = [
+                { author: user_id },
+                { editors: user_id },
+                { followers: user_id }
+            ];
+        }
+
+        const calendars = await Calendar.find(query)
+            .populate("author", "login email pfp_url")
+            .populate("editors", "login email pfp_url");
+
+        return calendars.map(calendar => calendar.toDTO());
+    }
 }
 
 export default new CalendarsService();
