@@ -30,3 +30,10 @@ export const generate_token_pair = (payload) => {
     }
 }
 
+export const generate_invite_token = (payload) => {
+    return jwt.sign(payload, process.env.INVITE_SECRET, { expiresIn: '10m' });
+}
+
+export const verify_invite_token = (token) => {
+    return jwt.verify(token, process.env.INVITE_SECRET);
+}

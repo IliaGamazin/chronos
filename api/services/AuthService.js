@@ -16,7 +16,7 @@ class AuthService {
             ]
         });
         if (existing) {
-            throw new ConflictError();
+            throw new ConflictError("User with email/login already exists");
         }
 
         const user = await User.create({
@@ -57,9 +57,12 @@ class AuthService {
         });
 
         res.status(status).json({
-            message,
-            user,
-            access_token: tokens.access_token
+            success: true,
+            data: {
+                message,
+                user,
+                access_token: tokens.access_token
+            },
         })
     }
 }

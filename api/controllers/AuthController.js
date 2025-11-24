@@ -38,8 +38,8 @@ export const login = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
     try {
-        delete res.cookie('refresh_token', null);
-        return res.status(200).send();
+        delete res.cookie("refresh_token", null);
+        return res.status(204).send();
     }
     catch (error) {
         next(error);
