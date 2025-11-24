@@ -59,7 +59,7 @@ export const invite = async (req, res, next) => {
             });
         }
 
-        const link = await CalendarsService.invite_link(
+        const token = await CalendarsService.invite_link(
             req.user.id,
             req.params.calendar_id,
             role
@@ -67,7 +67,7 @@ export const invite = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            data: link
+            data: token
         });
     }
     catch (error) {
@@ -92,7 +92,16 @@ export const invite_accept = async (req, res, next) => {
 
 export const update_calendar = async (req, res, next) => {
     try {
+        const calendar = await CalendarsService.update_calendar(
+            req.user.id,
+            req.params.calendar_id,
+            req.body
+        );
 
+        return res.status(200).json({
+            success: true,
+            data: calendar
+        });
     }
     catch (error) {
         next(error);

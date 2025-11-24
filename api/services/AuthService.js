@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 
 import User from "../database/models/user.js";
+import CalendarService from "./CalendarsService.js";
 import ConflictError from "../errors/ConflictError.js";
 import NotFoundError from "../errors/NotFoundError.js";
 import UnauthorizedError from "../errors/UnauthorizedError.js";
@@ -22,6 +23,17 @@ class AuthService {
         const user = await User.create({
             login, email, full_name, password
         });
+
+        const default_calendar = await CalendarService.new_calender(
+            `${full_name}'s Calendar`,
+            "Your personal calendar",
+            user._id,
+            "#3b82f6",
+            "UTC",
+        );
+
+        user.default_calendar = default_calendar.id;
+        await user.save();
 
         return user.toDTO();
     }
@@ -62,8 +74,8 @@ class AuthService {
                 message,
                 user,
                 access_token: tokens.access_token
-            },
-        })
+            }
+        });
     }
 }
 

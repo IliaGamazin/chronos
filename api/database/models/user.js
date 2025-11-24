@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     pfp_url: {
         type: String,
         required: false
+    },
+    default_calendar: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Calendar"
     }
 });
 

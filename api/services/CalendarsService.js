@@ -60,7 +60,10 @@ class CalendarsService {
             throw new NotFoundError("No calendar with id");
         }
 
-        if (calendar.author.toString() !== user_id && !calendar.editors.includes(user_id)) {
+        const is_author = calendar.author.toString() === user_id.toString();
+        const is_editor = calendar.editors.some(id => id.toString() === user_id.toString());
+
+        if (!is_author && !is_editor) {
             throw new UnauthorizedError("You don't have permission to invite to this calendar");
         }
 
@@ -112,6 +115,36 @@ class CalendarsService {
                 $addToSet: { followers: user_id }
             });
         }
+    }
+
+    async update_calendar(user_id, calendar_id, body) {
+        const calendar = await Calendar.findById(calendar_id);
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
+
+        const is_author = calendar.author.toString() === user_id.toString();
+        const is_editor = calendar.editors.some(id => id.toString() === user_id.toString());
+
+        if (!is_author && !is_editor) {
+            throw new UnauthorizedError("You don't have permission to update this calendar");
+        }
+
+        if (body?.name) {
+            calendar.name = body.name;
+        }
+        if (body?.description) {
+            calendar.description = body.description;
+        }
+        if (body?.color) {
+            calendar.color = body.color;
+        }
+        if (body?.timezone) {
+            calendar.timezone = body.timezone;
+        }
+
+        await calendar.save();
+        return calendar.toDTO();
     }
 }
 

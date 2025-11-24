@@ -7,13 +7,17 @@ import {
 } from "../controllers/CalendarsController.js";
 import { authenticate } from "../middleware/AuthMiddleware.js";
 
-router.get("/", authenticate, get_calendars);
-router.get("/:calendar_id", authenticate, get_calendar);
-router.post("/", authenticate, new_calendar);
-router.patch("/", authenticate, update_calendar);
-router.delete("/", authenticate, delete_calendar);
+router.use(authenticate);
 
-router.post("/:calendar_id/invite", authenticate, invite);
-router.post("/invite/:token", authenticate, invite_accept);
+router.get("/", get_calendars);
+router.post("/", new_calendar);
+
+router.get("/:calendar_id", get_calendar);
+router.post("/:calendar_id/invite", invite);
+router.post("/invite/:token", invite_accept);
+router.patch("/:calendar_id", update_calendar);
+router.delete("/:calendar_id", delete_calendar);
+router.delete("/:calendar_id/unfollow", delete_calendar);
+router.delete("/:calendar_id/:user_id", delete_calendar);
 
 export default router;
