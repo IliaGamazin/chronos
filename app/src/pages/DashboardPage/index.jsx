@@ -1,6 +1,7 @@
 import { useAuthContext } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import './DashboardPage.css';
+import Schedule from '../../components/Schedule/Schedule';
 
 const DashboardPage = () => {
   const { user } = useAuthContext();
@@ -18,9 +19,8 @@ const DashboardPage = () => {
         </div>
       </header>
       <main className="dashboard-content">
-        <div className="placeholder">
-          <h2>Dashboard coming soon...</h2>
-          <p>Schedule-x integration will be added here</p>
+        <div className="schedule-calendar">
+          <Schedule />
         </div>
       </main>
     </div>
