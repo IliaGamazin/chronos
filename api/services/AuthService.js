@@ -61,11 +61,11 @@ class AuthService {
 
         const tokens = generate_token_pair(payload);
 
-        res.cookie('refresh_token', tokens.refresh_token, {
+        res.cookie("refresh_token", tokens.refresh_token, {
             secure: false,
-            same_site: 'none',
+            same_site: "none",
             maxAge: 24 * 60 * 60 * 1000,
-            domain: 'localhost'
+            domain: "localhost"
         });
 
         res.status(status).json({

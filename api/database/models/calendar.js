@@ -27,7 +27,7 @@ const calendarSchema = new mongoose.Schema({
     }],
     color: {
         type: String,
-        default: '#3b82f6',
+        default: "#3b82f6",
         match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Please enter a valid hex color (e.g., #3b82f6 or #fff)"]
     },
     timezone: {
@@ -37,7 +37,7 @@ const calendarSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 calendarSchema.methods.toDTO = function() {
-    const format_user = (u) => (u && typeof u.toDTO === 'function') ? u.toDTO() : u;
+    const format_user = (u) => (u && typeof u.toDTO === "function") ? u.toDTO() : u;
     return {
         id: this._id,
         name: this.name,
