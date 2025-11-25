@@ -144,6 +144,10 @@ class CalendarsService {
         }
 
         await calendar.save();
+        await calendar.populate("author", "login email");
+        await calendar.populate("editors", "login email");
+        await calendar.populate("followers", "login email");
+
         return calendar.toDTO();
     }
 }

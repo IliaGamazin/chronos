@@ -37,13 +37,14 @@ const calendarSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 calendarSchema.methods.toDTO = function() {
+    const format_user = (u) => (u && typeof u.toDTO === 'function') ? u.toDTO() : u;
     return {
         id: this._id,
         name: this.name,
         description: this.description,
-        author: this.author,
-        editors: this.editors,
-        followers: this.followers,
+        author: format_user(this.author),
+        editors: this.editors.map(format_user),
+        followers: this.followers.map(format_user),
         color: this.color,
         timezone: this.timezone,
         created_at: this.createdAt,
