@@ -23,11 +23,11 @@ const calendarSchema = new mongoose.Schema({
     }],
     followers: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "User"
     }],
     color: {
         type: String,
-        default: '#3b82f6',
+        default: "#3b82f6",
         match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Please enter a valid hex color (e.g., #3b82f6 or #fff)"]
     },
     timezone: {
@@ -37,13 +37,14 @@ const calendarSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 calendarSchema.methods.toDTO = function() {
+    const format_user = (u) => (u && typeof u.toDTO === "function") ? u.toDTO() : u;
     return {
         id: this._id,
         name: this.name,
         description: this.description,
-        author: this.author,
-        editors: this.editors,
-        followers: this.followers,
+        author: format_user(this.author),
+        editors: this.editors.map(format_user),
+        followers: this.followers.map(format_user),
         color: this.color,
         timezone: this.timezone,
         created_at: this.createdAt,
