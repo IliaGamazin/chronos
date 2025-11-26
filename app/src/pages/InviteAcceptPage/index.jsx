@@ -8,8 +8,8 @@ const InviteAcceptPage = () => {
 
     const handleAccept = async () => {
         try {
-            const response = await axiosInstance.post(`/calendars/invite/${token}`);
-            console.log(response)
+            // const response = await axiosInstance.post(`/calendars/invite/${token}`);
+            // console.log(response)
             navigate("/dashboard");
         } catch(e) {
             console.log(e);
