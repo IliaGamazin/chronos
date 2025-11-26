@@ -89,7 +89,6 @@ export const invite_accept = async (req, res, next) => {
     }
 }
 
-
 export const update_calendar = async (req, res, next) => {
     try {
         const calendar = await CalendarsService.update_calendar(
