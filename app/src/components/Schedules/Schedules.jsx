@@ -67,26 +67,26 @@ const Schedules = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      if (formData.id) {
-        // console.log(formData.id)
-        // const response = await axiosInstance.patch(`/calendars/${formData.id}`, formData);
-        // const updatedCalendar = response.data.data;
+      // if (formData.id) {
+      //   console.log(formData.id)
+      //   const response = await axiosInstance.patch(`/calendars/${formData.id}`, formData);
+      //   const updatedCalendar = response.data.data;
         
-        // setUserCalendars(prev => prev.map(cal => 
-        //   cal.id === formData.id ? updatedCalendar : cal
-        // ));
+      //   setUserCalendars(prev => prev.map(cal => 
+      //     cal.id === formData.id ? updatedCalendar : cal
+      //   ));
         
-        // setEditableCalendars(prev => prev.map(cal => 
-        //   cal.id === formData.id ? updatedCalendar : cal
-        // ));
+      //   setEditableCalendars(prev => prev.map(cal => 
+      //     cal.id === formData.id ? updatedCalendar : cal
+      //   ));
         
-        // setFollowedCalendars(prev => prev.map(cal => 
-        //   cal.id === formData.id ? updatedCalendar : cal
-        // ));
-      } else {
-        // const response = await axiosInstance.post("/calendars/", formData);
-        // setUserCalendars(prev => [...prev, response.data.data]);
-      }
+      //   setFollowedCalendars(prev => prev.map(cal => 
+      //     cal.id === formData.id ? updatedCalendar : cal
+      //   ));
+      // } else {
+      //   const response = await axiosInstance.post("/calendars/", formData);
+      //   setUserCalendars(prev => [...prev, response.data.data]);
+      // }
       
       handleClose();
     } catch (error) {
