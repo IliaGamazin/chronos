@@ -25,11 +25,11 @@ const eventSchema = new mongoose.Schema({
     timezone: {
         type: String, default: "UTC"
     },
-    calendars: [{
+    calendar: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Calendar",
         required: true
-    }],
+    },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

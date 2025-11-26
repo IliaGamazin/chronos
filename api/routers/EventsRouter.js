@@ -10,7 +10,7 @@ import {
 router.use(authenticate);
 
 router.get("/", get_events);
-router.get("/", new_event);
+router.post("/", new_event);
 router.get("/:event_id", get_event);
 router.patch("/:event_id", update_event);
 router.delete("/:event_id", delete_event);
