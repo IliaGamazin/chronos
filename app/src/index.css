@@ -70,7 +70,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-input {
+input:not([type='checkbox']):not([type='radio']) {
   font-family: inherit;
   font-size: 1em;
   padding: 0.6em 1.2em;
@@ -81,7 +81,7 @@ input {
   transition: border-color 0.25s;
 }
 
-input:focus {
+input:not([type='checkbox']):not([type='radio']):focus {
   outline: none;
   border-color: #646cff;
 }
@@ -100,7 +100,7 @@ input:focus {
     background-color: #f9f9f9;
   }
 
-  input {
+  input:not([type='checkbox']):not([type='radio']) {
     background-color: #ffffff;
     color: #213547;
     border-color: #ddd;
