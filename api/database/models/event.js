@@ -25,7 +25,6 @@ const eventSchema = new mongoose.Schema({
     timezone: {
         type: String, default: "UTC"
     },
-
     calendars: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Calendar",
@@ -36,13 +35,6 @@ const eventSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
-    editors: [{
-        type: mongoose.Schema.Types.ObjectId, ref: "User",
-    }],
-    followers: [{
-        type: mongoose.Schema.Types.ObjectId, ref: "User"
-    }],
-
     recurrence: {
         frequency: { type: String, enum: ["daily", "weekly", "monthly", "yearly"] },
         interval: { type: Number, default: 1 },
