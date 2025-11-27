@@ -1,40 +1,50 @@
-import { useNavigate, useParams } from "react-router-dom";
-import "./InviteAcceptPage.css";
-import CustomButton from "@/shared/CustomButton";
-import { useEffect, useState } from "react";
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import './InviteAcceptPage.css';
+import CustomButton from '@/shared/CustomButton';
+import { useAcceptInvite } from '@/hooks/useInvites';
 
 const InviteAcceptPage = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  const [role, setRole] = useState("");
-
-  useEffect(() => {
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload.role) setRole(payload.role);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }, [token]);
+  const acceptMutation = useAcceptInvite();
+  const [error, setError] = useState(null);
 
   const handleAccept = async () => {
     try {
-      //API call
-      navigate("/dashboard");
-    } catch (e) {
-      console.log(e);
+      await acceptMutation.mutateAsync(token);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Failed to accept invite:', error);
+      setError('Failed to accept invitation. The link may be invalid or expired.');
     }
   };
+
+  const handleDecline = () => {
+    navigate('/dashboard');
+  };
+
+  if (error) {
+    return (
+      <div className="invite-page">
+        <div className="invite-card">
+          <h1 className="invite-title">Invalid Invitation</h1>
+          <p className="invite-description">{error}</p>
+          <CustomButton onClick={() => navigate('/dashboard')} variant="primary">
+            Go to Dashboard
+          </CustomButton>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="invite-page">
       <div className="invite-card">
-        <h1 className="invite-title">Invitation</h1>
+        <h1 className="invite-title">Calendar Invitation</h1>
 
         <p className="invite-description">
-          You have been invited to join a calendar as <strong>{role}</strong>.
+          You have been invited to join a calendar.
           <br />
           Would you like to accept this invitation?
         </p>
@@ -43,13 +53,15 @@ const InviteAcceptPage = () => {
           <CustomButton
             onClick={handleAccept}
             variant="primary"
+            disabled={acceptMutation.isPending}
           >
-            Accept
+            {acceptMutation.isPending ? 'Accepting...' : 'Accept'}
           </CustomButton>
 
           <CustomButton
-            onClick={() => navigate("/dashboard")}
+            onClick={handleDecline}
             variant="secondary"
+            disabled={acceptMutation.isPending}
           >
             Decline
           </CustomButton>

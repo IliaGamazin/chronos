@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
+import IconButton from '@/shared/IconButton';
 import './Modal.css';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
@@ -27,9 +29,9 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{title}</h2>
-          <button className="modal-close" onClick={onClose}>
-            ×
-          </button>
+          <IconButton onClick={onClose} variant="secondary" className="modal-close">
+            <X size={18} />
+          </IconButton>
         </div>
         <div className="modal-body">{children}</div>
       </div>

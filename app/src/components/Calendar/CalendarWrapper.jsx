@@ -7,15 +7,22 @@ import listPlugin from '@fullcalendar/list';
 import Checkbox from '@/shared/Checkbox';
 import CalendarSidebar from './CalendarSidebar';
 import EventModal from './EventModal';
-import { calendarCategories } from '@/utils/mockCalendarData';
 import './Calendar.css';
 
-const CalendarWrapper = ({ events, categories, onToggleCategory, onCreateEvent, isCreatingEvent, onCreateCalendar, isCreatingCalendar }) => {
+const CalendarWrapper = ({
+  events,
+  categories,
+  onToggleCategory,
+  onCreateEvent,
+  isCreatingEvent,
+  onCreateCalendar,
+  isCreatingCalendar,
+  onCreateInvite,
+  isCreatingInvite,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRange, setSelectedRange] = useState(null);
-
-  const handleEventClick = () => {};
 
   const handleDateClick = dateInfo => {
     setSelectedDate(dateInfo.dateStr);
@@ -113,6 +120,8 @@ const CalendarWrapper = ({ events, categories, onToggleCategory, onCreateEvent, 
         onToggleCategory={onToggleCategory}
         onCreateCalendar={onCreateCalendar}
         isCreatingCalendar={isCreatingCalendar}
+        onCreateInvite={onCreateInvite}
+        isCreatingInvite={isCreatingInvite}
       />
       <div className="calendar-container">
         <FullCalendar
@@ -133,7 +142,6 @@ const CalendarWrapper = ({ events, categories, onToggleCategory, onCreateEvent, 
           selectable={true}
           selectMirror={true}
           dayMaxEvents={true}
-          eventClick={handleEventClick}
           dateClick={handleDateClick}
           select={handleSelect}
           height="auto"
@@ -156,7 +164,7 @@ const CalendarWrapper = ({ events, categories, onToggleCategory, onCreateEvent, 
           endTime: selectedRange?.endTime,
           endDate: selectedRange?.endDate,
         }}
-        categories={calendarCategories}
+        categories={categories}
       />
     </div>
   );

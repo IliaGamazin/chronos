@@ -3,6 +3,8 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useEvents, useCreateEvent } from '@/hooks/useEvents';
 import { useCalendars, useCreateCalendar } from '@/hooks/useCalendars';
+import { useCreateInvite } from '@/hooks/useInvites';
+import CustomButton from '@/shared/CustomButton';
 import CalendarWrapper from '@/components/Calendar/CalendarWrapper';
 import { backendToFullCalendar } from '@/utils/eventMapping';
 import './DashboardPage.css';
@@ -15,6 +17,7 @@ const DashboardPage = () => {
   const { data: calendarsData, isLoading: calendarsLoading, error: calendarsError } = useCalendars();
   const createEventMutation = useCreateEvent();
   const createCalendarMutation = useCreateCalendar();
+  const createInviteMutation = useCreateInvite();
 
   const [categories, setCategories] = useState({});
 
@@ -60,9 +63,9 @@ const DashboardPage = () => {
           <h1>Chronos Dashboard</h1>
           <div className="user-info">
             <span className="welcome-text">Welcome, {user?.full_name}!</span>
-            <button onClick={logout} className="logout-button">
+            <CustomButton onClick={logout} variant="secondary" className="logout-button">
               Logout
-            </button>
+            </CustomButton>
           </div>
         </header>
         <main className="dashboard-content">
@@ -79,9 +82,9 @@ const DashboardPage = () => {
           <h1>Chronos Dashboard</h1>
           <div className="user-info">
             <span className="welcome-text">Welcome, {user?.full_name}!</span>
-            <button onClick={logout} className="logout-button">
+            <CustomButton onClick={logout} variant="secondary" className="logout-button">
               Logout
-            </button>
+            </CustomButton>
           </div>
         </header>
         <main className="dashboard-content">
@@ -99,9 +102,9 @@ const DashboardPage = () => {
         <h1>Chronos Dashboard</h1>
         <div className="user-info">
           <span className="welcome-text">Welcome, {user?.full_name}!</span>
-          <button onClick={logout} className="logout-button">
+          <CustomButton onClick={logout} variant="secondary" className="logout-button">
             Logout
-          </button>
+          </CustomButton>
         </div>
       </header>
       <main className="dashboard-content">
@@ -113,6 +116,8 @@ const DashboardPage = () => {
           isCreatingEvent={createEventMutation.isPending}
           onCreateCalendar={createCalendarMutation.mutate}
           isCreatingCalendar={createCalendarMutation.isPending}
+          onCreateInvite={createInviteMutation.mutateAsync}
+          isCreatingInvite={createInviteMutation.isPending}
         />
       </main>
     </div>

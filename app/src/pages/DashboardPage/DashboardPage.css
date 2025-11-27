@@ -48,12 +48,4 @@
   .welcome-text {
     color: rgba(0, 0, 0, 0.7);
   }
-
-  .placeholder h2 {
-    color: rgba(0, 0, 0, 0.9);
-  }
-
-  .placeholder p {
-    color: rgba(0, 0, 0, 0.6);
-  }
 }

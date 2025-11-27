@@ -1,4 +1,6 @@
+import CustomInput from '@/shared/CustomInput';
 import CustomTextarea from '@/shared/CustomTextarea';
+import CustomButton from '@/shared/CustomButton';
 
 const CalendarForm = ({
   calendarName,
@@ -13,10 +15,10 @@ const CalendarForm = ({
 }) => {
   return (
     <div className="add-calendar-form">
-      <input
+      <CustomInput
         type="text"
+        name="calendar-name"
         placeholder="Calendar name"
-        className="calendar-name-input"
         value={calendarName}
         onChange={onNameChange}
       />
@@ -34,16 +36,16 @@ const CalendarForm = ({
         className="calendar-color-input"
       />
       <div className="form-actions-inline">
-        <button
-          className="btn-save"
+        <CustomButton
           onClick={onSave}
           disabled={isCreating || !calendarName.trim()}
+          variant="primary"
         >
           {isCreating ? 'Saving...' : 'Save'}
-        </button>
-        <button className="btn-cancel" onClick={onCancel} disabled={isCreating}>
+        </CustomButton>
+        <CustomButton onClick={onCancel} disabled={isCreating} variant="secondary">
           Cancel
-        </button>
+        </CustomButton>
       </div>
     </div>
   );

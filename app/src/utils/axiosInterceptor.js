@@ -31,7 +31,10 @@ export const setupAxiosInterceptors = () => {
   axiosInstance.interceptors.request.use(
     config => {
       const token = authService.getToken();
-      if (token && !config.url.includes('/auth/')) {
+      const isAuthEndpoint = config.url.includes('/auth/login') ||
+                            config.url.includes('/auth/register');
+
+      if (token && !isAuthEndpoint) {
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;

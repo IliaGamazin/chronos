@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Modal from '@/shared/Modal';
 import CustomInput from '@/shared/CustomInput';
 import CustomSelect from '@/shared/CustomSelect';
+import CustomButton from '@/shared/CustomButton';
 import './EventModal.css';
 
 const EventModal = ({
@@ -173,17 +174,17 @@ const EventModal = ({
         )}
 
         <div className="form-actions">
-          <button
+          <CustomButton
             type="button"
             onClick={onClose}
-            className="button-secondary"
+            variant="secondary"
             disabled={isSubmitting}
           >
             Cancel
-          </button>
-          <button type="submit" className="button-primary" disabled={isSubmitting}>
+          </CustomButton>
+          <CustomButton type="submit" variant="primary" disabled={isSubmitting}>
             {isSubmitting ? 'Creating...' : 'Create Event'}
-          </button>
+          </CustomButton>
         </div>
       </form>
     </Modal>
