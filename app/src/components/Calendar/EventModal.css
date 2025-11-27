@@ -1,0 +1,51 @@
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.button-primary,
+.button-secondary {
+  padding: 0.5em 1.2em;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.button-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.button-primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.button-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.button-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

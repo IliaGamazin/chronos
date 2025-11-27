@@ -3,7 +3,9 @@ import { useAuthContext } from '@/context/AuthContext';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import InviteAcceptPage from '@/pages/InviteAcceptPage';
+import AuthLayout from '@/layouts/AuthLayout';
+import ProtectedLayout from '@/layouts/ProtectedLayout';
 import './App.css';
 
 function App() {
@@ -20,34 +22,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/login"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <LoginPage />
-            )
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <RegisterPage />
-            )
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
+        <Route element={<ProtectedLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/invite/:token" element={<InviteAcceptPage />} />
+        </Route>
+
         <Route
           path="/"
           element={
