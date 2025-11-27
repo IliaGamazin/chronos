@@ -5,6 +5,7 @@ import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import './App.css';
+import InviteAcceptPage from './pages/InviteAcceptPage';
 
 function App() {
   const { isAuthenticated, loading } = useAuthContext();
@@ -45,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="/invite/:token"
+          element={
+            <ProtectedRoute>
+              <InviteAcceptPage />
             </ProtectedRoute>
           }
         />
