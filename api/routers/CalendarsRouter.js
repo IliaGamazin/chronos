@@ -17,7 +17,7 @@ router.post("/:calendar_id/invite", invite);
 router.post("/invite/:token", invite_accept);
 router.patch("/:calendar_id", update_calendar);
 router.delete("/:calendar_id", delete_calendar);
-router.delete("/:calendar_id/unfollow", delete_calendar);
-router.delete("/:calendar_id/:user_id", delete_calendar);
+router.delete("/:calendar_id/unfollow", unfollow_calendar);
+router.delete("/:calendar_id/:user_id", remove_collaborator);
 
 export default router;

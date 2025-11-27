@@ -26,6 +26,28 @@ class CalendarsService {
         return calendar.toDTO();
     }
 
+    async get_calendar(user_id, calendar_id) {
+        const user = await User.findById(user_id);
+        if (!user) {
+            throw new NotFoundError("No user with id");
+        }
+
+        const calendar = await Calendar.findById(calendar_id);
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
+
+        const is_author = calendar.author.toString() === user_id.toString();
+        const is_editor = calendar.editors.some(id => id.toString() === user_id.toString());
+        const is_follower = calendar.followers.some(id => id.toString() === user_id.toString());
+
+        if (!is_author && is_editor && !is_follower) {
+            throw new UnauthorizedError("You don't have permission to access this calendar");
+        }
+
+        return calendar.toDTO();
+    }
+
     async get_calendars(user_id, status) {
         let query = {};
 
