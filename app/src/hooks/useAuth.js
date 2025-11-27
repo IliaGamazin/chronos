@@ -16,9 +16,9 @@ export const useAuth = () => {
 
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: data => {
-      const { accessToken, user } = data;
-      login(accessToken, user);
+    onSuccess: response => {
+      const { access_token, user } = response.data;
+      login(access_token, user);
       navigate('/dashboard');
     },
   });

@@ -1,17 +1,17 @@
-.input-wrapper {
+.textarea-wrapper {
   display: flex;
   flex-direction: column;
   gap: 6px;
   width: 100%;
 }
 
-.input-wrapper label {
+.textarea-wrapper label {
   font-size: 0.875rem;
   font-weight: 500;
   color: #374151;
 }
 
-.input-wrapper input {
+.textarea-wrapper textarea {
   width: 100%;
   padding: 0.6em 1.2em;
   font-size: 1em;
@@ -21,19 +21,20 @@
   background-color: #ffffff;
   color: #111827;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  resize: vertical;
 }
 
-.input-wrapper input:focus {
+.textarea-wrapper textarea:focus {
   outline: none;
   border-color: #d1d5db;
   box-shadow: none;
 }
 
-.input-wrapper input::placeholder {
+.textarea-wrapper textarea::placeholder {
   color: #9ca3af;
 }
 
-.input-wrapper input:disabled {
+.textarea-wrapper textarea:disabled {
   background-color: #f3f4f6;
   color: #6b7280;
   cursor: not-allowed;

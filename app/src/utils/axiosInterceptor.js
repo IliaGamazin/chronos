@@ -66,13 +66,13 @@ export const setupAxiosInterceptors = () => {
         isRefreshing = true;
 
         try {
-          const { data } = await axiosInstance.post('/auth/refresh');
-          const { accessToken } = data;
+          const response = await axiosInstance.post('/auth/refresh');
+          const { access_token } = response.data.data;
 
-          authService.setToken(accessToken);
-          axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+          authService.setToken(access_token);
+          axiosInstance.defaults.headers.common.Authorization = `Bearer ${access_token}`;
 
-          processQueue(null, accessToken);
+          processQueue(null, access_token);
           return axiosInstance(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);

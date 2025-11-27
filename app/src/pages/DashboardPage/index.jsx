@@ -1,24 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useEvents, useCreateEvent } from '@/hooks/useEvents';
+import { useCalendars, useCreateCalendar } from '@/hooks/useCalendars';
 import CalendarWrapper from '@/components/Calendar/CalendarWrapper';
-import { mockEvents, calendarCategories } from '@/utils/mockCalendarData';
+import { backendToFullCalendar } from '@/utils/eventMapping';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
   const { user } = useAuthContext();
   const { logout } = useAuth();
 
-  const [categories, setCategories] = useState(() => {
-    const initialCategories = {};
-    Object.keys(calendarCategories).forEach(key => {
-      initialCategories[key] = {
-        ...calendarCategories[key],
-        visible: true,
-      };
-    });
-    return initialCategories;
-  });
+  const { data: eventsData, isLoading: eventsLoading, error: eventsError } = useEvents();
+  const { data: calendarsData, isLoading: calendarsLoading, error: calendarsError } = useCalendars();
+  const createEventMutation = useCreateEvent();
+  const createCalendarMutation = useCreateCalendar();
+
+  const [categories, setCategories] = useState({});
+
+  useEffect(() => {
+    if (calendarsData?.data) {
+      const calendarCategories = {};
+      calendarsData.data.forEach(calendar => {
+        const key = calendar.id || calendar._id;
+        calendarCategories[key] = {
+          name: calendar.name,
+          color: calendar.color,
+          borderColor: calendar.color,
+          visible: true,
+        };
+      });
+      setCategories(calendarCategories);
+    }
+  }, [calendarsData]);
 
   const handleToggleCategory = categoryKey => {
     setCategories(prev => ({
@@ -30,17 +44,54 @@ const DashboardPage = () => {
     }));
   };
 
-  const visibleEvents = mockEvents
+  const events = eventsData?.data || [];
+
+  const visibleEvents = events
     .filter(event => categories[event.calendar]?.visible)
-    .map(event => {
-      const category = calendarCategories[event.calendar];
-      return {
-        ...event,
-        backgroundColor: category.color,
-        borderColor: category.borderColor,
-        display: 'block',
-      };
-    });
+    .map(event => backendToFullCalendar(event, categories));
+
+  const isLoading = eventsLoading || calendarsLoading;
+  const error = eventsError || calendarsError;
+
+  if (isLoading) {
+    return (
+      <div className="dashboard">
+        <header className="dashboard-header">
+          <h1>Chronos Dashboard</h1>
+          <div className="user-info">
+            <span className="welcome-text">Welcome, {user?.full_name}!</span>
+            <button onClick={logout} className="logout-button">
+              Logout
+            </button>
+          </div>
+        </header>
+        <main className="dashboard-content">
+          <div className="loading-message">Loading events...</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard">
+        <header className="dashboard-header">
+          <h1>Chronos Dashboard</h1>
+          <div className="user-info">
+            <span className="welcome-text">Welcome, {user?.full_name}!</span>
+            <button onClick={logout} className="logout-button">
+              Logout
+            </button>
+          </div>
+        </header>
+        <main className="dashboard-content">
+          <div className="error-message">
+            Error loading events: {error.message}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
@@ -58,6 +109,10 @@ const DashboardPage = () => {
           events={visibleEvents}
           categories={categories}
           onToggleCategory={handleToggleCategory}
+          onCreateEvent={createEventMutation.mutate}
+          isCreatingEvent={createEventMutation.isPending}
+          onCreateCalendar={createCalendarMutation.mutate}
+          isCreatingCalendar={createCalendarMutation.isPending}
         />
       </main>
     </div>

@@ -9,6 +9,11 @@
   padding: 0;
 }
 
+*:focus,
+*:focus-visible {
+  outline: none !important;
+}
+
 :root {
   font-family:
     system-ui,
@@ -33,6 +38,22 @@
 
 body {
   min-height: 100vh;
+  overflow: overlay;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 #root {
@@ -75,15 +96,15 @@ input:not([type='checkbox']):not([type='radio']) {
   font-size: 1em;
   padding: 0.6em 1.2em;
   border-radius: 8px;
-  border: 1px solid #444;
-  background-color: #1a1a1a;
-  color: rgba(255, 255, 255, 0.87);
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #111827;
   transition: border-color 0.25s;
 }
 
 input:not([type='checkbox']):not([type='radio']):focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #d1d5db;
 }
 
 @media (prefers-color-scheme: light) {
@@ -98,11 +119,5 @@ input:not([type='checkbox']):not([type='radio']):focus {
 
   button {
     background-color: #f9f9f9;
-  }
-
-  input:not([type='checkbox']):not([type='radio']) {
-    background-color: #ffffff;
-    color: #213547;
-    border-color: #ddd;
   }
 }

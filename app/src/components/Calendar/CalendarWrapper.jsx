@@ -1,15 +1,68 @@
+import { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import Checkbox from '@/shared/Checkbox';
+import CalendarSidebar from './CalendarSidebar';
+import EventModal from './EventModal';
+import { calendarCategories } from '@/utils/mockCalendarData';
 import './Calendar.css';
 
-const CalendarWrapper = ({ events, categories, onToggleCategory }) => {
+const CalendarWrapper = ({ events, categories, onToggleCategory, onCreateEvent, isCreatingEvent, onCreateCalendar, isCreatingCalendar }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedRange, setSelectedRange] = useState(null);
+
   const handleEventClick = () => {};
 
-  const handleDateClick = () => {};
+  const handleDateClick = dateInfo => {
+    setSelectedDate(dateInfo.dateStr);
+    setSelectedRange(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSelect = selectInfo => {
+    const start = selectInfo.start;
+    const end = selectInfo.end;
+
+    const startDate = start.toISOString().split('T')[0];
+
+    if (selectInfo.allDay) {
+      const endDate = new Date(end);
+      endDate.setDate(endDate.getDate() - 1);
+      const endDateStr = endDate.toISOString().split('T')[0];
+
+      setSelectedDate(startDate);
+      setSelectedRange({
+        endDate: endDateStr !== startDate ? endDateStr : null,
+        allDay: true,
+      });
+    } else {
+      const startTime = start.toTimeString().slice(0, 5);
+      const endTime = end.toTimeString().slice(0, 5);
+
+      setSelectedDate(startDate);
+      setSelectedRange({
+        startTime,
+        endTime,
+        allDay: false,
+      });
+    }
+
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedDate(null);
+    setSelectedRange(null);
+  };
+
+  const handleCreateEvent = eventData => {
+    onCreateEvent(eventData);
+  };
 
   const renderEventContent = eventInfo => {
     const { event } = eventInfo;
@@ -55,27 +108,12 @@ const CalendarWrapper = ({ events, categories, onToggleCategory }) => {
 
   return (
     <div className="calendar-wrapper">
-      <aside className="calendar-sidebar">
-        <h3>Calendars</h3>
-        <ul className="calendar-list">
-          {Object.entries(categories).map(([key, category]) => (
-            <li key={key} className="calendar-item">
-              <label className="calendar-toggle">
-                <Checkbox
-                  checked={category.visible}
-                  onChange={() => onToggleCategory(key)}
-                  variant="primary"
-                />
-                <span
-                  className="calendar-color"
-                  style={{ backgroundColor: category.color }}
-                />
-                <span className="calendar-name">{category.name}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
-      </aside>
+      <CalendarSidebar
+        categories={categories}
+        onToggleCategory={onToggleCategory}
+        onCreateCalendar={onCreateCalendar}
+        isCreatingCalendar={isCreatingCalendar}
+      />
       <div className="calendar-container">
         <FullCalendar
           plugins={[
@@ -97,6 +135,7 @@ const CalendarWrapper = ({ events, categories, onToggleCategory }) => {
           dayMaxEvents={true}
           eventClick={handleEventClick}
           dateClick={handleDateClick}
+          select={handleSelect}
           height="auto"
           eventDurationEditable={true}
           eventStartEditable={true}
@@ -106,6 +145,19 @@ const CalendarWrapper = ({ events, categories, onToggleCategory }) => {
           eventContent={renderEventContent}
         />
       </div>
+      <EventModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleCreateEvent}
+        isSubmitting={isCreatingEvent}
+        initialData={{
+          date: selectedDate,
+          startTime: selectedRange?.startTime,
+          endTime: selectedRange?.endTime,
+          endDate: selectedRange?.endDate,
+        }}
+        categories={calendarCategories}
+      />
     </div>
   );
 };
