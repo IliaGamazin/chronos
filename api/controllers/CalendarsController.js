@@ -148,7 +148,7 @@ export const remove_collaborator = async (req, res, next) => {
     try {
         await CalendarsService.remove_collaborator(
             req.user.id,
-            req.params.calendar_id,+
+            req.params.calendar_id,
             req.params.user_id
         );
 

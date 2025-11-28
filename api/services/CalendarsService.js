@@ -225,8 +225,39 @@ class CalendarsService {
         );
     }
 
-    async remove_collaborator() {
+    async remove_collaborator(user_id, calendar_id, collaborator_id) {
+        const calendar = await Calendar.findById(calendar_id);
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
 
+        const is_author = calendar.author.toString() === user_id.toString();
+        const is_editor = calendar.editors.some(id => id.toString() === user_id.toString());
+
+        if (!is_author && !is_editor) {
+            throw new ForbiddenError("You don't have rights to remove collaborators");
+        }
+
+        const is_collaborator_editor = calendar.editors.some(id => id.toString() === collaborator_id.toString());
+        const is_collaborator_follower = calendar.followers.some(id => id.toString() === collaborator_id.toString());
+
+        if (!is_collaborator_editor && !is_collaborator_follower) {
+            throw new NotFoundError("User is not a collaborator of this calendar");
+        }
+
+        if (is_collaborator_editor && !is_author) {
+            throw new ForbiddenError("Only the author can remove editors");
+        }
+
+        await Calendar.findByIdAndUpdate(
+            calendar_id,
+            {
+                $pull: {
+                    editors: collaborator_id,
+                    followers: collaborator_id
+                }
+            }
+        );
     }
 }
 
