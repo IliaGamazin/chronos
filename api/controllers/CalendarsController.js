@@ -6,6 +6,7 @@ export const get_calendars = async (req, res, next) => {
             req.user.id,
             req.query.status
         );
+
         return res.status(200).json({
             success: true,
             data: calendars
@@ -18,7 +19,15 @@ export const get_calendars = async (req, res, next) => {
 
 export const get_calendar = async (req, res, next) => {
     try {
+        const calendar = await CalendarsService.get_calendar(
+            req.user.id,
+            req.params.calendar_id
+        );
 
+        return res.status(200).json({
+            success: true,
+            data: calendar
+        });
     }
     catch (error) {
         next(error);
@@ -109,7 +118,41 @@ export const update_calendar = async (req, res, next) => {
 
 export const delete_calendar = async (req, res, next) => {
     try {
+        await CalendarsService.delete_calendar(
+            req.user.id,
+            req.params.calendar_id
+        );
 
+        return res.status(204).send();
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export const unfollow_calendar = async (req, res, next) => {
+    try {
+        await CalendarsService.unfollow_calendar(
+            req.user.id,
+            req.params.calendar_id
+        );
+
+        return res.status(204).send();
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export const remove_collaborator = async (req, res, next) => {
+    try {
+        await CalendarsService.remove_collaborator(
+            req.user.id,
+            req.params.calendar_id,
+            req.params.user_id
+        );
+
+        return res.status(204).send();
     }
     catch (error) {
         next(error);
