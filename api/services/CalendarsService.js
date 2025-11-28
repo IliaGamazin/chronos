@@ -1,10 +1,12 @@
 import User from "../database/models/user.js";
+import Event from "../database/models/event.js";
 import Calendar from "../database/models/calendar.js";
 import NotFoundError from "../errors/NotFoundError.js";
 import UnauthorizedError from "../errors/UnauthorizedError.js";
 
 import {generate_invite_token, verify_invite_token} from "./JwtService.js";
 import ConflictError from "../errors/ConflictError.js";
+import ForbiddenError from "../errors/ForbiddenError.js";
 
 class CalendarsService {
     async new_calender(name, description, author_id, color, timezone) {
@@ -107,7 +109,7 @@ class CalendarsService {
 
         const user = await User.findById(user_id);
         if (!user) {
-            throw new NotFoundException("User not found");
+            throw new NotFoundError("User not found");
         }
 
         if (user.id === calendar.author) {
@@ -171,6 +173,60 @@ class CalendarsService {
         await calendar.populate("followers", "login email pfp_url");
 
         return calendar.toDTO();
+    }
+
+    async delete_calendar(user_id, calendar_id) {
+        const calendar = await Calendar.findById(calendar_id);
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
+
+        const user = await User.findById(user_id);
+        if (!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        const is_author = calendar.author.toString() === user_id.toString();
+
+        if (!is_author || user.default_calendar.toString() === calendar._id.toString()) {
+            throw new ForbiddenError("You can't delete this calendar");
+        }
+
+        await Event.deleteMany({ calendar: calendar_id });
+        await Calendar.findByIdAndDelete(calendar_id);
+    }
+
+    async unfollow_calendar(user_id, calendar_id) {
+        const calendar = await Calendar.findById(calendar_id);
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
+
+        const user = await User.findById(user_id);
+        if (!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        const is_author = calendar.author.toString() === user._id.toString();
+        const is_default = user.default_calendar.toString() === calendar._id.toString();
+
+        if (is_author || is_default) {
+            throw new ForbiddenError("You can't unfollow this calendar");
+        }
+
+        await Calendar.findByIdAndUpdate(
+            calendar_id,
+            {
+                $pull: {
+                    editors: user_id,
+                    followers: user_id
+                }
+            }
+        );
+    }
+
+    async remove_collaborator() {
+
     }
 }
 
