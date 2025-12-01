@@ -29,6 +29,17 @@
   color: white;
 }
 
+.custom-button.danger {
+  background-color: transparent;
+  color: #f63b3b;
+  border: 1px solid #f63b3b;
+}
+
+.custom-button.danger:hover:not(:disabled) {
+  background-color: #f63b3b;
+  color: white;
+}
+
 .custom-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
