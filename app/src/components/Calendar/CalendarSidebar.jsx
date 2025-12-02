@@ -4,6 +4,7 @@ import IconButton from '@/shared/IconButton';
 import CalendarForm from './CalendarForm';
 import CalendarListItem from './CalendarListItem';
 import InviteModal from './InviteModal';
+import CalendarEditForm from './CalendarEditForm';
 
 const CalendarSidebar = ({
   categories,
@@ -19,6 +20,8 @@ const CalendarSidebar = ({
   const [newCalendarName, setNewCalendarName] = useState('');
   const [newCalendarDescription, setNewCalendarDescription] = useState('');
   const [newCalendarColor, setNewCalendarColor] = useState('#3b82f6');
+  const [editedCalendar, setEditedCalendar] = useState(null);
+  const [calendarEditors, setCalendarEditors] = useState([]);
 
   const handleSaveCalendar = () => {
     if (!newCalendarName.trim()) return;
@@ -33,14 +36,17 @@ const CalendarSidebar = ({
     setNewCalendarName('');
     setNewCalendarDescription('');
     setNewCalendarColor('#3b82f6');
+    setCalendarEditors([]);
     setIsAddingCalendar(false);
   };
 
   const handleCancelCalendar = () => {
     setIsAddingCalendar(false);
+    setEditedCalendar(null);
     setNewCalendarName('');
     setNewCalendarDescription('');
     setNewCalendarColor('#3b82f6');
+    setCalendarEditors([]);
   };
 
   const handleCreateInvite = inviteData => {
@@ -63,6 +69,34 @@ const CalendarSidebar = ({
     setInviteLink('');
   };
 
+  const handleEditCalendar = (calendar) => {
+    if(isAddingCalendar) {
+      setIsAddingCalendar(!isAddingCalendar);
+    }
+    setEditedCalendar(calendar);
+    setNewCalendarName(calendar.name)
+    setNewCalendarDescription(calendar.description);
+    setNewCalendarColor(calendar.color);
+    setCalendarEditors(calendar.editors);
+  } 
+
+  const handleUpdateCalendar = () => {
+    //
+    handleCancelCalendar();
+  }
+
+  const handleCreateCalendar = () => {
+    setNewCalendarName('');
+    setNewCalendarDescription('');
+    setNewCalendarColor('#3b82f6');
+    setCalendarEditors([]);
+    
+    setIsAddingCalendar(!isAddingCalendar)
+    if(editedCalendar) {
+      setEditedCalendar(null);
+    }
+  }
+
   return (
     <aside className="calendar-sidebar">
       <div className="sidebar-header">
@@ -76,7 +110,7 @@ const CalendarSidebar = ({
             <Mail size={16} />
           </IconButton>
           <IconButton
-            onClick={() => setIsAddingCalendar(!isAddingCalendar)}
+            onClick={() => handleCreateCalendar()}
             title="Add calendar"
             variant="primary"
           >
@@ -97,6 +131,21 @@ const CalendarSidebar = ({
           isCreating={isCreatingCalendar}
         />
       )}
+      {editedCalendar && (
+        <CalendarEditForm
+          calendarName={newCalendarName}
+          calendarDescription={newCalendarDescription}
+          calendarColor={newCalendarColor}
+          calendarEditors={calendarEditors}
+          onNameChange={e => setNewCalendarName(e.target.value)}
+          onDescriptionChange={e => setNewCalendarDescription(e.target.value)}
+          onColorChange={e => setNewCalendarColor(e.target.value)}
+          onEditorsChange={setCalendarEditors}
+          onSave={handleUpdateCalendar}
+          onCancel={handleCancelCalendar}
+          isCreating={isCreatingCalendar}
+        />
+      )}
       <ul className="calendar-list">
         {Object.entries(categories).map(([key, category]) => (
           <CalendarListItem
@@ -104,6 +153,7 @@ const CalendarSidebar = ({
             calendarKey={key}
             category={category}
             onToggle={onToggleCategory}
+            onEditToggle={handleEditCalendar}
           />
         ))}
       </ul>

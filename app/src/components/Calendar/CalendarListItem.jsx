@@ -1,6 +1,8 @@
 import Checkbox from '@/shared/Checkbox';
+import IconButton from '@/shared/IconButton'
+import {Pencil } from 'lucide-react';
 
-const CalendarListItem = ({ calendarKey, category, onToggle }) => {
+const CalendarListItem = ({ calendarKey, category, onToggle, onEditToggle }) => {
   return (
     <li className="calendar-item">
       <label className="calendar-toggle">
@@ -14,6 +16,16 @@ const CalendarListItem = ({ calendarKey, category, onToggle }) => {
           style={{ backgroundColor: category.color }}
         />
         <span className="calendar-name">{category.name}</span>
+        <span className='edit-toggle'>
+          <IconButton 
+            onClick={() => onEditToggle(category)}
+            title="Edit Calendar"
+            variant="secondary"
+          >
+            <Pencil size={16} />  
+          </IconButton>          
+        </span>
+
       </label>
     </li>
   );

@@ -31,6 +31,7 @@ const DashboardPage = () => {
           color: calendar.color,
           borderColor: calendar.color,
           visible: true,
+          editors: calendar.editors,
         };
       });
       setCategories(calendarCategories);
