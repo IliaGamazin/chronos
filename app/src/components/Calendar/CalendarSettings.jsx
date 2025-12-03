@@ -25,7 +25,6 @@ const CalendarSettings = ({
 
   const isOwner = calendar.role === 'owner';
   const isEditor = calendar.role === 'editor';
-  const isFollower = calendar.role === 'follower';
 
   const handleSave = () => {
     onUpdate({
@@ -180,12 +179,12 @@ const CalendarSettings = ({
                   {calendar.editors.map((editor) => (
                     <div key={editor.id} className="collaborator-item">
                       <div className="collaborator-info">
-                        <span className="collaborator-name">{editor.name || editor.email}</span>
+                        <span className="collaborator-name">{editor.login || editor.email}</span>
                         <span className="collaborator-email">{editor.email}</span>
                       </div>
                       {isOwner && (
                         <IconButton
-                          onClick={() => handleRemoveCollaborator(editor.id, editor.name || editor.email)}
+                          onClick={() => handleRemoveCollaborator(editor.id, editor.login || editor.email)}
                           disabled={isRemovingCollaborator}
                           title="Remove editor"
                           variant="danger"
@@ -204,12 +203,12 @@ const CalendarSettings = ({
                   {calendar.followers.map((follower) => (
                     <div key={follower.id} className="collaborator-item">
                       <div className="collaborator-info">
-                        <span className="collaborator-name">{follower.name || follower.email}</span>
+                        <span className="collaborator-name">{follower.login || follower.email}</span>
                         <span className="collaborator-email">{follower.email}</span>
                       </div>
                       {isOwner && (
                         <IconButton
-                          onClick={() => handleRemoveCollaborator(follower.id, follower.name || follower.email)}
+                          onClick={() => handleRemoveCollaborator(follower.id, follower.login || follower.email)}
                           disabled={isRemovingCollaborator}
                           title="Remove follower"
                           variant="danger"
