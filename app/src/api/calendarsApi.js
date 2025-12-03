@@ -22,7 +22,29 @@ export const calendarsApi = {
   },
 
   deleteCalendar: async calendarId => {
-    const response = await axiosInstance.delete(`/calendars/${calendarId}`);
-    return response.data;
+    console.log('[DELETE] Starting delete request for calendar:', calendarId);
+    try {
+      const response = await axiosInstance.delete(`/calendars/${calendarId}`, {
+        timeout: 10000,
+      });
+      console.log('[DELETE] Response received:', response.status, response.data);
+      return response.data || { success: true };
+    } catch (error) {
+      console.error('[DELETE] Error occurred:', error);
+      if (error.code === 'ECONNABORTED') {
+        console.error('[DELETE] Request timed out after 10 seconds');
+      }
+      throw error;
+    }
+  },
+
+  unfollowCalendar: async calendarId => {
+    const response = await axiosInstance.delete(`/calendars/${calendarId}/unfollow`);
+    return response.data || { success: true };
+  },
+
+  removeCollaborator: async ({ calendarId, userId }) => {
+    const response = await axiosInstance.delete(`/calendars/${calendarId}/${userId}`);
+    return response.data || { success: true };
   },
 };

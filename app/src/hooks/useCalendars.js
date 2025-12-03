@@ -37,6 +37,38 @@ export const useDeleteCalendar = () => {
     mutationFn: calendarsApi.deleteCalendar,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+};
+
+export const useCalendar = calendarId => {
+  return useQuery({
+    queryKey: ['calendar', calendarId],
+    queryFn: () => calendarsApi.getCalendar(calendarId),
+    enabled: !!calendarId,
+  });
+};
+
+export const useUnfollowCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: calendarsApi.unfollowCalendar,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendars'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+};
+
+export const useRemoveCollaborator = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: calendarsApi.removeCollaborator,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calendars'] });
     },
   });
 };

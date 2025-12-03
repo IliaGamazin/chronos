@@ -17,7 +17,7 @@ export const invitesApi = {
 
   acceptInvite: async token => {
     const response = await axiosInstance.post(`/calendars/invite/${token}`);
-    return response.data;
+    return response.data || { success: true };
   },
 
   declineInvite: async token => {

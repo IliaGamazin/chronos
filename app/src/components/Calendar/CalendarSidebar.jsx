@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Plus, Mail } from 'lucide-react';
 import IconButton from '@/shared/IconButton';
-import CalendarForm from './CalendarForm';
 import CalendarListItem from './CalendarListItem';
 import InviteModal from './InviteModal';
+import CalendarModal from './CalendarModal';
 
 const CalendarSidebar = ({
   categories,
@@ -12,35 +12,15 @@ const CalendarSidebar = ({
   isCreatingCalendar,
   onCreateInvite,
   isCreatingInvite,
+  onOpenCalendarSettings,
 }) => {
-  const [isAddingCalendar, setIsAddingCalendar] = useState(false);
+  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
-  const [newCalendarName, setNewCalendarName] = useState('');
-  const [newCalendarDescription, setNewCalendarDescription] = useState('');
-  const [newCalendarColor, setNewCalendarColor] = useState('#3b82f6');
 
-  const handleSaveCalendar = () => {
-    if (!newCalendarName.trim()) return;
-
-    onCreateCalendar({
-      name: newCalendarName,
-      description: newCalendarDescription,
-      color: newCalendarColor,
-      timezone: 'UTC',
-    });
-
-    setNewCalendarName('');
-    setNewCalendarDescription('');
-    setNewCalendarColor('#3b82f6');
-    setIsAddingCalendar(false);
-  };
-
-  const handleCancelCalendar = () => {
-    setIsAddingCalendar(false);
-    setNewCalendarName('');
-    setNewCalendarDescription('');
-    setNewCalendarColor('#3b82f6');
+  const handleCreateCalendar = calendarData => {
+    onCreateCalendar(calendarData);
+    setIsCalendarModalOpen(false);
   };
 
   const handleCreateInvite = inviteData => {
@@ -63,6 +43,10 @@ const CalendarSidebar = ({
     setInviteLink('');
   };
 
+  const handleEditCalendar = (calendarKey, calendar) => {
+    onOpenCalendarSettings(calendarKey, calendar);
+  };
+
   return (
     <aside className="calendar-sidebar">
       <div className="sidebar-header">
@@ -76,7 +60,7 @@ const CalendarSidebar = ({
             <Mail size={16} />
           </IconButton>
           <IconButton
-            onClick={() => setIsAddingCalendar(!isAddingCalendar)}
+            onClick={() => setIsCalendarModalOpen(true)}
             title="Add calendar"
             variant="primary"
           >
@@ -84,19 +68,6 @@ const CalendarSidebar = ({
           </IconButton>
         </div>
       </div>
-      {isAddingCalendar && (
-        <CalendarForm
-          calendarName={newCalendarName}
-          calendarDescription={newCalendarDescription}
-          calendarColor={newCalendarColor}
-          onNameChange={e => setNewCalendarName(e.target.value)}
-          onDescriptionChange={e => setNewCalendarDescription(e.target.value)}
-          onColorChange={e => setNewCalendarColor(e.target.value)}
-          onSave={handleSaveCalendar}
-          onCancel={handleCancelCalendar}
-          isCreating={isCreatingCalendar}
-        />
-      )}
       <ul className="calendar-list">
         {Object.entries(categories).map(([key, category]) => (
           <CalendarListItem
@@ -104,9 +75,16 @@ const CalendarSidebar = ({
             calendarKey={key}
             category={category}
             onToggle={onToggleCategory}
+            onEditToggle={handleEditCalendar}
           />
         ))}
       </ul>
+      <CalendarModal
+        isOpen={isCalendarModalOpen}
+        onClose={() => setIsCalendarModalOpen(false)}
+        onSubmit={handleCreateCalendar}
+        isSubmitting={isCreatingCalendar}
+      />
       <InviteModal
         isOpen={isInviteModalOpen}
         onClose={handleCloseInviteModal}
