@@ -2,9 +2,10 @@ import EventsService from "../services/EventsService.js";
 
 export const get_events = async (req, res, next) => {
     try {
+        const calendar_ids = [].concat(req.query.calendars)
         const events = await EventsService.get_events(
             req.user.id,
-            req.query.calendars,
+            calendar_ids,
             req.query.from,
             req.query.to
         );
@@ -39,7 +40,7 @@ export const get_event = async (req, res, next) => {
 export const new_event = async (req, res, next) => {
     try {
         const allowed_types = ["fullday", "task", "arrangement"];
-        const allowed_recurs = ["daily", "weekly", "monthly"];
+        const allowed_recurs = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"];
 
         if (!allowed_types.includes(req.body.type)) {
             return res.status(400).json({
@@ -52,7 +53,7 @@ export const new_event = async (req, res, next) => {
         }
 
         const recurrence = req.body.recurrence;
-        if (recurrence && !allowed_recurs.includes(recurrence.frequency)) {
+        if (recurrence && !allowed_recurs.includes(recurrence.freq)) {
             return res.status(400).json({
                 success: false,
                 error: {
