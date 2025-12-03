@@ -17,13 +17,16 @@ const CalendarListItem = ({ calendarKey, category, onToggle, onEditToggle }) => 
         />
         <span className="calendar-name">{category.name}</span>
         <span className='edit-toggle'>
-          <IconButton 
-            onClick={() => onEditToggle(category)}
-            title="Edit Calendar"
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditToggle(calendarKey, category);
+            }}
+            title="Calendar Settings"
             variant="secondary"
           >
-            <Pencil size={16} />  
-          </IconButton>          
+            <Pencil size={12} />
+          </IconButton>
         </span>
 
       </label>

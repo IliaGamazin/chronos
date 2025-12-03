@@ -9,8 +9,10 @@ export const useAuth = () => {
 
   const registerMutation = useMutation({
     mutationFn: authApi.register,
-    onSuccess: () => {
-      navigate('/login');
+    onSuccess: response => {
+      const { access_token, user } = response.data;
+      login(access_token, user);
+      navigate('/dashboard');
     },
   });
 

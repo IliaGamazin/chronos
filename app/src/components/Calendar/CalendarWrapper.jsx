@@ -5,20 +5,14 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import Checkbox from '@/shared/Checkbox';
-import CalendarSidebar from './CalendarSidebar';
 import EventModal from './EventModal';
 import './Calendar.css';
 
 const CalendarWrapper = ({
   events,
   categories,
-  onToggleCategory,
   onCreateEvent,
   isCreatingEvent,
-  onCreateCalendar,
-  isCreatingCalendar,
-  onCreateInvite,
-  isCreatingInvite,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -114,45 +108,35 @@ const CalendarWrapper = ({
   };
 
   return (
-    <div className="calendar-wrapper">
-      <CalendarSidebar
-        categories={categories}
-        onToggleCategory={onToggleCategory}
-        onCreateCalendar={onCreateCalendar}
-        isCreatingCalendar={isCreatingCalendar}
-        onCreateInvite={onCreateInvite}
-        isCreatingInvite={isCreatingInvite}
+    <div className="calendar-container">
+      <FullCalendar
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          listPlugin,
+        ]}
+        initialView="dayGridMonth"
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+        }}
+        events={events}
+        editable={true}
+        selectable={true}
+        selectMirror={true}
+        dayMaxEvents={true}
+        dateClick={handleDateClick}
+        select={handleSelect}
+        height="100%"
+        eventDurationEditable={true}
+        eventStartEditable={true}
+        dragScroll={true}
+        snapDuration="00:15:00"
+        eventOverlap={true}
+        eventContent={renderEventContent}
       />
-      <div className="calendar-container">
-        <FullCalendar
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin,
-            listPlugin,
-          ]}
-          initialView="dayGridMonth"
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-          }}
-          events={events}
-          editable={true}
-          selectable={true}
-          selectMirror={true}
-          dayMaxEvents={true}
-          dateClick={handleDateClick}
-          select={handleSelect}
-          height="auto"
-          eventDurationEditable={true}
-          eventStartEditable={true}
-          dragScroll={true}
-          snapDuration="00:15:00"
-          eventOverlap={true}
-          eventContent={renderEventContent}
-        />
-      </div>
       <EventModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

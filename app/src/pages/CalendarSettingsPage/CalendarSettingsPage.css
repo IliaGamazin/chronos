@@ -1,0 +1,245 @@
+.calendar-settings-page {
+  min-height: 100vh;
+  background: #f0f9ff;
+  padding: 2rem;
+}
+
+.settings-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+  overflow: hidden;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: #f0f9ff;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.settings-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.settings-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-section h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e40af;
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.section-placeholder {
+  padding: 2rem;
+  background: #f0f9ff;
+  border: 1px dashed #3b82f6;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.section-placeholder p {
+  margin: 0 0 0.5rem 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.placeholder-hint {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+}
+
+.collaborators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.collaborator-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f0f9ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.collaborator-item:hover {
+  background: #dbeafe;
+}
+
+.collaborator-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.collaborator-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.collaborator-role {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+.color-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.color-input-wrapper label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.calendar-color-input {
+  width: 100%;
+  max-width: 200px;
+  height: 50px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.calendar-color-input:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+.calendar-color-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.read-only-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.read-only-field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 6px;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+.settings-actions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #3b82f6;
+}
+
+.action-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-group button {
+  flex: 1;
+  min-width: 150px;
+}
+
+.danger-zone {
+  padding: 1.5rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.danger-zone h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #991b1b;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.danger-zone button {
+  width: fit-content;
+}
+
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .calendar-settings-page {
+    padding: 1rem;
+  }
+
+  .settings-header {
+    padding: 1.5rem;
+  }
+
+  .settings-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  .action-group {
+    flex-direction: column;
+  }
+
+  .action-group button {
+    width: 100%;
+  }
+}
