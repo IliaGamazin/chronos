@@ -15,7 +15,8 @@ const EventModal = ({
 }) => {
   const [formData, setFormData] = useState({
     title: initialData.title || '',
-    calendar: initialData.calendar || 'work',
+    calendar:
+      initialData.calendar || (categories && Object.keys(categories)[0]) || '',
     type: initialData.type || 'arrangement',
     date: initialData.date || '',
     startTime: initialData.startTime || '',
@@ -23,9 +24,19 @@ const EventModal = ({
     endDate: initialData.endDate || '',
   });
 
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrence, setRecurrence] = useState({
+    freq: 'DAILY',
+    interval: 1,
+    endType: 'never',
+    until: '',
+    count: null,
+  });
+
   useEffect(() => {
     if (isOpen) {
-      const hasEndDate = initialData.endDate && initialData.endDate !== initialData.date;
+      const hasEndDate =
+        initialData.endDate && initialData.endDate !== initialData.date;
       const hasTimeRange = initialData.startTime && initialData.endTime;
 
       let defaultType = 'arrangement';
@@ -37,15 +48,27 @@ const EventModal = ({
 
       setFormData({
         title: initialData.title || '',
-        calendar: initialData.calendar || 'work',
+        calendar:
+          initialData.calendar ||
+          (categories && Object.keys(categories)[0]) ||
+          '',
         type: initialData.type || defaultType,
         date: initialData.date || '',
         startTime: initialData.startTime || '',
         endTime: initialData.endTime || '',
         endDate: initialData.endDate || '',
       });
+
+      setIsRecurring(false);
+      setRecurrence({
+        freq: 'DAILY',
+        interval: 1,
+        endType: 'never',
+        until: '',
+        count: null,
+      });
     }
-  }, [isOpen, initialData.date, initialData.endDate, initialData.startTime, initialData.endTime]);
+  }, [isOpen, initialData, categories]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -56,19 +79,43 @@ const EventModal = ({
     e.preventDefault();
 
     const eventData = {
-      title: formData.title,
-      calendar: formData.calendar,
+      name: formData.title,
+      calendar_id: formData.calendar,
       type: formData.type,
     };
 
     if (formData.type === 'arrangement') {
       const startDateTime = `${formData.date}T${formData.startTime}:00`;
       const endDateTime = `${formData.date}T${formData.endTime}:00`;
-      eventData.start_time = new Date(startDateTime).toISOString();
-      eventData.end_time = new Date(endDateTime).toISOString();
+
+      eventData.start_date = new Date(startDateTime).toISOString();
+      eventData.end_date = new Date(endDateTime).toISOString();
     } else {
-      eventData.start_date = formData.date;
-      eventData.end_date = formData.endDate || formData.date;
+      const startDateObj = new Date(formData.date);
+
+      let endDateObj = formData.endDate
+        ? new Date(formData.endDate)
+        : new Date(formData.date);
+
+      if (endDateObj <= startDateObj) {
+        endDateObj.setDate(startDateObj.getDate() + 1);
+      }
+
+      eventData.start_date = startDateObj.toISOString();
+      eventData.end_date = endDateObj.toISOString();
+    }
+
+    if (isRecurring) {
+      eventData.recurrence = {
+        freq: recurrence.freq,
+        interval: recurrence.interval,
+      };
+
+      if (recurrence.endType === 'until' && recurrence.until) {
+        eventData.recurrence.until = new Date(recurrence.until).toISOString();
+      } else if (recurrence.endType === 'count' && recurrence.count) {
+        eventData.recurrence.count = recurrence.count;
+      }
     }
 
     if (formData.type === 'task') {
@@ -76,9 +123,10 @@ const EventModal = ({
     }
 
     onSubmit(eventData);
+
     setFormData({
       title: '',
-      calendar: 'work',
+      calendar: (categories && Object.keys(categories)[0]) || '',
       type: 'arrangement',
       date: '',
       startTime: '',
@@ -125,11 +173,12 @@ const EventModal = ({
           onChange={handleChange}
           required
         >
-          {Object.entries(categories).map(([key, category]) => (
-            <option key={key} value={key}>
-              {category.name}
-            </option>
-          ))}
+          {categories &&
+            Object.entries(categories).map(([key, category]) => (
+              <option key={key} value={key}>
+                {category.name}
+              </option>
+            ))}
         </CustomSelect>
 
         <CustomInput
@@ -141,13 +190,14 @@ const EventModal = ({
           required
         />
 
-        {isAllDayEvent && formData.endDate && (
+        {isAllDayEvent && (
           <CustomInput
             type="date"
             name="endDate"
-            label="End Date"
+            label="End Date (Optional)"
             value={formData.endDate}
             onChange={handleChange}
+            placeholder="Leave empty for 1 day"
           />
         )}
 
@@ -171,6 +221,132 @@ const EventModal = ({
               required
             />
           </>
+        )}
+
+        <div className="recurring-section">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={isRecurring}
+              onChange={e => setIsRecurring(e.target.checked)}
+            />
+            <span>Recurring Event</span>
+          </label>
+        </div>
+
+        {isRecurring && (
+          <div className="recurrence-options">
+            <div className="recurrence-row">
+              <CustomSelect
+                id="freq"
+                name="freq"
+                label="Frequency"
+                value={recurrence.freq}
+                onChange={e =>
+                  setRecurrence(prev => ({ ...prev, freq: e.target.value }))
+                }
+              >
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+                <option value="MONTHLY">Monthly</option>
+                <option value="YEARLY">Yearly</option>
+              </CustomSelect>
+
+              <CustomInput
+                type="number"
+                name="interval"
+                label="Repeat Every"
+                value={recurrence.interval}
+                onChange={e =>
+                  setRecurrence(prev => ({
+                    ...prev,
+                    interval: parseInt(e.target.value) || 1,
+                  }))
+                }
+                min="1"
+                placeholder="1"
+              />
+            </div>
+
+            <div className="end-condition-section">
+              <label className="section-label">Ends</label>
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="endType"
+                  value="never"
+                  checked={recurrence.endType === 'never'}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      endType: e.target.value,
+                    }))
+                  }
+                />
+                <span>Never</span>
+              </label>
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="endType"
+                  value="until"
+                  checked={recurrence.endType === 'until'}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      endType: e.target.value,
+                    }))
+                  }
+                />
+                <span>On date</span>
+              </label>
+              {recurrence.endType === 'until' && (
+                <CustomInput
+                  type="date"
+                  name="until"
+                  label=""
+                  value={recurrence.until}
+                  onChange={e =>
+                    setRecurrence(prev => ({ ...prev, until: e.target.value }))
+                  }
+                />
+              )}
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="endType"
+                  value="count"
+                  checked={recurrence.endType === 'count'}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      endType: e.target.value,
+                    }))
+                  }
+                />
+                <span>After</span>
+              </label>
+              {recurrence.endType === 'count' && (
+                <CustomInput
+                  type="number"
+                  name="count"
+                  label=""
+                  value={recurrence.count || ''}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      count: parseInt(e.target.value) || null,
+                    }))
+                  }
+                  min="1"
+                  placeholder="Number of occurrences"
+                />
+              )}
+            </div>
+          </div>
         )}
 
         <div className="form-actions">
