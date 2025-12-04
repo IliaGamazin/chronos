@@ -1,5 +1,4 @@
 .profile-page {
-  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -197,11 +196,14 @@
 }
 
 .logout-section {
-  padding: 1.5rem;
-  border-top: 1px solid #dadce0;
-  display: flex;
-  justify-content: center;
-  background-color: #fafafa;
+  width: 100%;
+  max-width: 680px;
+  align-self: center;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  padding: 2.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .logout-btn {
@@ -214,9 +216,4 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background-color: #fef7f7;
-  border-color: #d93025;
 }

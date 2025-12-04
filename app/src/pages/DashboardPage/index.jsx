@@ -184,6 +184,13 @@ const DashboardPage = () => {
             >
               Logout
             </CustomButton>
+            <CustomButton 
+              onClick={() => navigate("/profile")} 
+              variant="secondary" 
+              className="profile-button"
+              >
+              Profile
+            </CustomButton>
           </div>
         </header>
         <main className="dashboard-content">
@@ -207,7 +214,11 @@ const DashboardPage = () => {
             >
               Logout
             </CustomButton>
-            <CustomButton onClick={() => navigate("/profile")} variant="secondary" className="profile-button">
+            <CustomButton 
+              onClick={() => navigate("/profile")} 
+              variant="secondary" 
+              className="profile-button"
+              >
               Profile
             </CustomButton>
           </div>
@@ -234,6 +245,13 @@ const DashboardPage = () => {
           >
             Logout
           </CustomButton>
+          <CustomButton 
+          onClick={() => navigate("/profile")} 
+          variant="secondary" 
+          className="profile-button"
+          >
+          Profile
+        </CustomButton>
         </div>
       </header>
       <main className="dashboard-content">
