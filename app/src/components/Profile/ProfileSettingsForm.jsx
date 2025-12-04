@@ -7,11 +7,11 @@ import AvatarChange from './AvatarChange';
 const ProfileSettingsForm = ({
   userFullName,
   userLogin,
-  userEmail,
+  //userEmail,
   userAvatar,
   onUserFullNameChange,
   onUserLoginChange,
-  onUserEmailChange,
+  //onUserEmailChange,
   onUserAvatarChange,
   onSubmit,
   onSubmitAvatar,
@@ -31,7 +31,7 @@ const ProfileSettingsForm = ({
 
         <div className="settings-form">
 					{error && (
-						<div className={styles.error}>
+						<div className="error">
 							{typeof error === 'string'
 								? error
 								: error?.message ||
@@ -54,12 +54,12 @@ const ProfileSettingsForm = ({
             onChange={onUserLoginChange}
           />
 
-          <CustomInput
+          {/* <CustomInput
             name="email"
             label="Email"
             value={userEmail}
             onChange={onUserEmailChange}
-          />
+          /> */}
         </div>
 
         <CustomButton

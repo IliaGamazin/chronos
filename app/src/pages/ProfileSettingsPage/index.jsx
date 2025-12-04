@@ -9,11 +9,16 @@ import IconButton from '@/shared/IconButton';
 import "@/pages/ProfilePage/ProfilePage.css";
 import { useEffect, useState } from 'react';
 import ProfileSettingsForm from "@/components/Profile/ProfileSettingsForm";
+import { useSetUserAvatar, useUpdateUser } from '../../hooks/useUser';
 
 const ProfileSettingsPage = () => {
   const { user } = useAuthContext();
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { updateUser } = useAuthContext();
+
+  const onUpdateUser = useUpdateUser();
+  const onSetUserAvatar = useSetUserAvatar();
 
   const [avatar, setAvatar] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
@@ -45,7 +50,13 @@ const ProfileSettingsPage = () => {
 
   const applyAvatar = async () => {
     if (!avatarFile) return;
-    // api call
+    try {
+     await onSetUserAvatar.mutateAsync({
+        pfp_url: avatarFile
+      });
+    } catch (err) {
+      setError(err.message);  
+    }
     console.log("Uploaded avatar:", avatarFile);
   };
 
@@ -53,7 +64,16 @@ const ProfileSettingsPage = () => {
     e.preventDefault();
     setIsSaving(true);
     console.log("Current form:", formData);
-    // api call
+    try {
+      const updated = await onUpdateUser.mutateAsync({
+        userData: formData,
+      });
+      console.log(updated)
+      updateUser({ ...user, ...formData, });
+    } catch (err) {
+      setError(err.message);
+    }
+
     setIsSaving(false);
   };
 
@@ -73,11 +93,11 @@ const ProfileSettingsPage = () => {
       <ProfileSettingsForm
         userFullName={formData.full_name}
         userLogin={formData.login}
-        userEmail={formData.email}
+        //userEmail={formData.email}
         userAvatar={avatar}
         onUserFullNameChange={handleChange}
         onUserLoginChange={handleChange}
-        onUserEmailChange={handleChange}
+        //onUserEmailChange={handleChange}
         onUserAvatarChange={handleAvatarChange}
         onSubmitAvatar={applyAvatar}
         onSubmit={handleSubmit}
