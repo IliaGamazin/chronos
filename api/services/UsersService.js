@@ -1,5 +1,6 @@
 import User from "../database/models/user.js";
 import NotFoundError from "../errors/NotFoundError.js";
+import ConflictError from "../errors/ConflictError.js";
 
 class UsersService {
     async get_user(user_id) {
@@ -18,6 +19,10 @@ class UsersService {
         }
 
         if (body?.login) {
+            const existing = await User.find({ login: body.login });
+            if (existing) {
+                throw new ConflictError("Login already taken");
+            }
             user.login = body.login;
         }
         if (body?.full_name) {
