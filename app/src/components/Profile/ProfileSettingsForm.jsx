@@ -1,5 +1,6 @@
 import CustomInput from '@/shared/CustomInput';
 import CustomButton from '@/shared/CustomButton';
+import { formatErrorMessage } from '@/utils/errorUtils';
 
 import AvatarChange from './AvatarChange';
 
@@ -15,6 +16,7 @@ const ProfileSettingsForm = ({
   onSubmit,
   onSubmitAvatar,
   isSaving,
+	error,
 }) => {
   return (
     <form className="profile-content" onSubmit={onSubmit}>
@@ -28,6 +30,16 @@ const ProfileSettingsForm = ({
         />
 
         <div className="settings-form">
+					{error && (
+						<div className={styles.error}>
+							{typeof error === 'string'
+								? error
+								: error?.message ||
+									formatErrorMessage(error) ||
+									'An error occurred'}
+						</div>
+					)}
+
           <CustomInput
             name="full_name"
             label="Full Name"

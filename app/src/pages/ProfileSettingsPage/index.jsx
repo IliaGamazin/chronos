@@ -18,6 +18,7 @@ const ProfileSettingsPage = () => {
   const [avatar, setAvatar] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     login: user.login || "",
@@ -81,6 +82,7 @@ const ProfileSettingsPage = () => {
         onSubmitAvatar={applyAvatar}
         onSubmit={handleSubmit}
         isSaving={isSaving}
+        error={error}
       />
 
       <div className="logout-section">
