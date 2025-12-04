@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useEvents, useCreateEvent } from '@/hooks/useEvents';
@@ -21,6 +22,7 @@ import './DashboardPage.css';
 const DashboardPage = () => {
   const { user } = useAuthContext();
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const { data: eventsData, isLoading: eventsLoading, error: eventsError } = useEvents();
   const { data: calendarsData, isLoading: calendarsLoading, error: calendarsError } = useCalendars();
@@ -157,6 +159,9 @@ const DashboardPage = () => {
             <span className="welcome-text">Welcome, {user?.full_name}!</span>
             <CustomButton onClick={logout} variant="secondary" className="logout-button">
               Logout
+            </CustomButton>
+            <CustomButton onClick={() => navigate("/profile")} variant="secondary" className="profile-button">
+              Profile
             </CustomButton>
           </div>
         </header>
