@@ -70,8 +70,9 @@ const ProfileSettingsPage = () => {
       });
       console.log(updated)
       updateUser({ ...user, ...formData, });
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      setError(err.response.data.error.message);
     }
 
     setIsSaving(false);
