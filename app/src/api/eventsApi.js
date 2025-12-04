@@ -1,8 +1,12 @@
 import { axiosInstance } from '@/utils/axiosInterceptor';
+import qs from 'qs';
 
 export const eventsApi = {
   getEvents: async filters => {
-    const response = await axiosInstance.get('/events', { params: filters });
+    const response = await axiosInstance.get('/events', {
+      params: filters,
+      paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+    });
     return response.data;
   },
 

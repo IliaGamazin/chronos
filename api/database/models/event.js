@@ -21,9 +21,8 @@ const eventSchema = new mongoose.Schema({
         freq: {
             type: String,
             enum: ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"],
-            required: true
         },
-        interval: { type: Number, default: 1 },
+        interval: { type: Number },
 
         until: { type: Date },
         count: { type: Number },

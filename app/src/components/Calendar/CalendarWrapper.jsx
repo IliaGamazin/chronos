@@ -1,22 +1,30 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
+import rrulePlugin from '@fullcalendar/rrule';
 import Checkbox from '@/shared/Checkbox';
 import EventModal from './EventModal';
 import './Calendar.css';
 
 const CalendarWrapper = ({
-  events,
+  eventSource,
   categories,
   onCreateEvent,
   isCreatingEvent,
 }) => {
+  const calendarRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRange, setSelectedRange] = useState(null);
+
+  useEffect(() => {
+    if (calendarRef.current) {
+      calendarRef.current.getApi().refetchEvents();
+    }
+  }, [categories]);
 
   const handleDateClick = dateInfo => {
     setSelectedDate(dateInfo.dateStr);
@@ -25,19 +33,22 @@ const CalendarWrapper = ({
   };
 
   const handleSelect = selectInfo => {
-    const start = selectInfo.start;
-    const end = selectInfo.end;
+    const { start, end, allDay, startStr, endStr } = selectInfo;
 
-    const startDate = start.toISOString().split('T')[0];
+    const startDate = startStr.split('T')[0];
 
-    if (selectInfo.allDay) {
-      const endDate = new Date(end);
-      endDate.setDate(endDate.getDate() - 1);
-      const endDateStr = endDate.toISOString().split('T')[0];
+    if (allDay) {
+      const endDateObj = new Date(endStr);
+      endDateObj.setDate(endDateObj.getDate() - 1);
+
+      const year = endDateObj.getFullYear();
+      const month = String(endDateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(endDateObj.getDate()).padStart(2, '0');
+      const endDateFormatted = `${year}-${month}-${day}`;
 
       setSelectedDate(startDate);
       setSelectedRange({
-        endDate: endDateStr !== startDate ? endDateStr : null,
+        endDate: endDateFormatted !== startDate ? endDateFormatted : null,
         allDay: true,
       });
     } else {
@@ -110,11 +121,13 @@ const CalendarWrapper = ({
   return (
     <div className="calendar-container">
       <FullCalendar
+        ref={calendarRef}
         plugins={[
           dayGridPlugin,
           timeGridPlugin,
           interactionPlugin,
           listPlugin,
+          rrulePlugin,
         ]}
         initialView="dayGridMonth"
         headerToolbar={{
@@ -122,7 +135,8 @@ const CalendarWrapper = ({
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
         }}
-        events={events}
+        events={eventSource}
+        lazyFetching={true}
         editable={true}
         selectable={true}
         selectMirror={true}

@@ -16,7 +16,6 @@ import CustomButton from '@/shared/CustomButton';
 import CalendarWrapper from '@/components/Calendar/CalendarWrapper';
 import CalendarSidebar from '@/components/Calendar/CalendarSidebar';
 import CalendarSettings from '@/components/Calendar/CalendarSettings';
-import { backendToFullCalendar } from '@/utils/eventMapping';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
@@ -24,8 +23,32 @@ const DashboardPage = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const { data: eventsData, isLoading: eventsLoading, error: eventsError } = useEvents();
-  const { data: calendarsData, isLoading: calendarsLoading, error: calendarsError } = useCalendars();
+  const {
+    data: calendarsData,
+    isLoading: calendarsLoading,
+    error: calendarsError,
+  } = useCalendars();
+
+  const calendarIds =
+    calendarsData?.data?.map(cal => cal.id || cal._id).filter(Boolean) || [];
+
+  console.log('[Dashboard] Valid Calendar IDs:', calendarIds);
+  console.log('[Dashboard] Raw Calendars Data:', calendarsData?.data);
+
+  const now = new Date();
+  const fromDate = new Date(now.getFullYear() - 5, 0, 1).toISOString();
+  const toDate = new Date(now.getFullYear() + 5, 0, 1).toISOString();
+
+  const {
+    data: eventsData,
+    isLoading: eventsLoading,
+    error: eventsError,
+  } = useEvents({
+    calendars: calendarIds,
+    from: fromDate,
+    to: toDate,
+  });
+
   const createEventMutation = useCreateEvent();
   const createCalendarMutation = useCreateCalendar();
   const createInviteMutation = useCreateInvite();
@@ -43,17 +66,19 @@ const DashboardPage = () => {
       const calendarCategories = {};
       calendarsData.data.forEach(calendar => {
         const key = calendar.id || calendar._id;
-        calendarCategories[key] = {
-          id: key,
-          name: calendar.name,
-          description: calendar.description,
-          color: calendar.color,
-          borderColor: calendar.color,
-          visible: true,
-          editors: calendar.editors,
-          followers: calendar.followers,
-          role: calendar.role || 'owner',
-        };
+        if (key) {
+          calendarCategories[key] = {
+            id: key,
+            name: calendar.name,
+            description: calendar.description,
+            color: calendar.color,
+            borderColor: calendar.color,
+            visible: true,
+            editors: calendar.editors,
+            followers: calendar.followers,
+            role: calendar.role || 'owner',
+          };
+        }
       });
       setCategories(calendarCategories);
     }
@@ -79,7 +104,7 @@ const DashboardPage = () => {
     setSelectedCalendarForEdit(null);
   };
 
-  const handleUpdateCalendar = (updateData) => {
+  const handleUpdateCalendar = updateData => {
     updateCalendarMutation.mutate(updateData, {
       onSuccess: () => {
         setCategories(prev => ({
@@ -97,20 +122,18 @@ const DashboardPage = () => {
     });
   };
 
-  const handleDeleteCalendar = (calendarId) => {
-    console.log('[Dashboard] handleDeleteCalendar called with:', calendarId);
+  const handleDeleteCalendar = calendarId => {
     deleteCalendarMutation.mutate(calendarId, {
       onSuccess: () => {
-        console.log('[Dashboard] Delete successful, navigating back');
         handleBackToCalendar();
       },
-      onError: (error) => {
+      onError: error => {
         console.error('[Dashboard] Delete failed:', error);
       },
     });
   };
 
-  const handleUnfollowCalendar = (calendarId) => {
+  const handleUnfollowCalendar = calendarId => {
     unfollowCalendarMutation.mutate(calendarId, {
       onSuccess: () => {
         handleBackToCalendar();
@@ -118,18 +141,34 @@ const DashboardPage = () => {
     });
   };
 
-  const handleRemoveCollaborator = (data) => {
+  const handleRemoveCollaborator = data => {
     removeCollaboratorMutation.mutate(data);
   };
 
   const events = eventsData?.data || [];
 
   const visibleEvents = events
-    .filter(event => categories[event.calendar]?.visible)
-    .map(event => backendToFullCalendar(event, categories));
+    .filter(event => {
+      const calendarData = event.extendedProps?.calendar;
+      const calendarId = calendarData?._id || calendarData?.id || calendarData;
+      if (!calendarId || !categories[calendarId]) return true;
+      return categories[calendarId].visible;
+    })
+    .map(event => {
+      const calendarData = event.extendedProps?.calendar;
+      const calendarId = calendarData?._id || calendarData?.id || calendarData;
+      const category = categories[calendarId];
 
-  const isLoading = eventsLoading || calendarsLoading;
-  const error = eventsError || calendarsError;
+      return {
+        ...event,
+        backgroundColor: category?.color || '#3788d8',
+        borderColor: category?.color || '#3788d8',
+        textColor: '#ffffff',
+      };
+    });
+
+  const isLoading = calendarsLoading;
+  const error = calendarsError;
 
   if (isLoading) {
     return (
@@ -138,7 +177,11 @@ const DashboardPage = () => {
           <h1>Chronos Dashboard</h1>
           <div className="user-info">
             <span className="welcome-text">Welcome, {user?.full_name}!</span>
-            <CustomButton onClick={logout} variant="secondary" className="logout-button">
+            <CustomButton
+              onClick={logout}
+              variant="secondary"
+              className="logout-button"
+            >
               Logout
             </CustomButton>
           </div>
@@ -157,7 +200,11 @@ const DashboardPage = () => {
           <h1>Chronos Dashboard</h1>
           <div className="user-info">
             <span className="welcome-text">Welcome, {user?.full_name}!</span>
-            <CustomButton onClick={logout} variant="secondary" className="logout-button">
+            <CustomButton
+              onClick={logout}
+              variant="secondary"
+              className="logout-button"
+            >
               Logout
             </CustomButton>
             <CustomButton onClick={() => navigate("/profile")} variant="secondary" className="profile-button">
@@ -180,7 +227,11 @@ const DashboardPage = () => {
         <h1>Chronos Dashboard</h1>
         <div className="user-info">
           <span className="welcome-text">Welcome, {user?.full_name}!</span>
-          <CustomButton onClick={logout} variant="secondary" className="logout-button">
+          <CustomButton
+            onClick={logout}
+            variant="secondary"
+            className="logout-button"
+          >
             Logout
           </CustomButton>
         </div>
@@ -198,7 +249,7 @@ const DashboardPage = () => {
           />
           {currentView === 'calendar' ? (
             <CalendarWrapper
-              events={visibleEvents}
+              eventSource={visibleEvents}
               categories={categories}
               onCreateEvent={createEventMutation.mutate}
               isCreatingEvent={createEventMutation.isPending}
