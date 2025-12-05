@@ -21,9 +21,8 @@ const eventSchema = new mongoose.Schema({
         freq: {
             type: String,
             enum: ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"],
-            required: true
         },
-        interval: { type: Number, default: 1 },
+        interval: { type: Number },
 
         until: { type: Date },
         count: { type: Number },
@@ -47,7 +46,7 @@ eventSchema.methods.toDTO = function() {
     let startVal = this.start_date.toISOString();
     let endVal = this.end_date.toISOString();
 
-    if (this.type === 'fullday') {
+    if (this.type === 'fullday' || this.type === 'task') {
         startVal = startVal.split('T')[0];
         endVal = endVal.split('T')[0];
     }
@@ -57,7 +56,7 @@ eventSchema.methods.toDTO = function() {
         title: this.name,
         start: startVal,
         end: endVal,
-        allDay: this.type === 'fullday',
+        allDay: this.type === 'fullday' || this.type === 'task',
 
         extendedProps: {
             description: this.description,

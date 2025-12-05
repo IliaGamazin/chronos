@@ -5,6 +5,7 @@ export const useEvents = filters => {
   return useQuery({
     queryKey: ['events', filters],
     queryFn: () => eventsApi.getEvents(filters),
+    enabled: !!filters.calendars && filters.calendars.length > 0,
   });
 };
 
@@ -12,6 +13,7 @@ export const useCreateEvent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['createEvent'],
     mutationFn: eventsApi.createEvent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });

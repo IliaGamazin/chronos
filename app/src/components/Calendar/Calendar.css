@@ -514,3 +514,45 @@
   background: #fee2e2;
 }
 
+/* Experimental CSS for limiting cell height - commented out for now */
+/*
+.fc-daygrid-body tr {
+  max-height: 150px;
+}
+
+.fc-daygrid-body .fc-scrollgrid-sync-table {
+  height: auto !important;
+}
+
+.fc-daygrid-day-events {
+  max-height: 120px;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+.fc-daygrid-day-events::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fc-daygrid-day-events::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fc-daygrid-day-events::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.fc-daygrid-day-events::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.fc-daygrid-day-events {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+*/
+
+.fc-daygrid-day {
+  min-height: 120px;
+}

@@ -1,5 +1,6 @@
 export const backendToFullCalendar = (backendEvent, categories) => {
-  const category = categories[backendEvent.calendar];
+  const calendarId = backendEvent.extendedProps?.calendar?._id || backendEvent.extendedProps?.calendar;
+  const category = categories[calendarId];
 
   const baseEvent = {
     id: backendEvent.id,
@@ -8,34 +9,31 @@ export const backendToFullCalendar = (backendEvent, categories) => {
     borderColor: category?.borderColor || '#2563eb',
     display: 'block',
     extendedProps: {
-      calendar: backendEvent.calendar,
-      type: backendEvent.type === 'task' ? 'task' : 'event',
+      calendar: calendarId,
+      type: backendEvent.extendedProps?.type || (backendEvent.type === 'task' ? 'task' : 'event'),
       completed: backendEvent.completed || false,
     },
   };
 
-  if (backendEvent.type === 'fullday' || backendEvent.type === 'task') {
-    if (backendEvent.end_date && backendEvent.end_date !== backendEvent.start_date) {
-      return {
-        ...baseEvent,
-        start: backendEvent.start_date,
-        end: backendEvent.end_date,
-        allDay: true,
-      };
-    }
+  let fcEvent = {
+    ...baseEvent,
+    start: backendEvent.start,
+    end: backendEvent.end,
+    allDay: backendEvent.allDay,
+  };
 
-    return {
-      ...baseEvent,
-      date: backendEvent.start_date,
-      allDay: true,
-    };
+  if (backendEvent.rrule) {
+    fcEvent.rrule = backendEvent.rrule;
+    if (fcEvent.end || fcEvent.date) {
+      const start = new Date(fcEvent.start || fcEvent.date);
+      const end = new Date(fcEvent.end || fcEvent.date);
+      fcEvent.duration = end - start;
+      delete fcEvent.end;
+      delete fcEvent.date;
+    }
   }
 
-  return {
-    ...baseEvent,
-    start: backendEvent.start_time,
-    end: backendEvent.end_time,
-  };
+  return fcEvent;
 };
 
 export const fullCalendarToBackend = fcEvent => {

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { DatePicker, TimePicker } from 'antd';
+import dayjs from 'dayjs';
 import Modal from '@/shared/Modal';
 import CustomInput from '@/shared/CustomInput';
 import CustomSelect from '@/shared/CustomSelect';
@@ -15,37 +17,58 @@ const EventModal = ({
 }) => {
   const [formData, setFormData] = useState({
     title: initialData.title || '',
-    calendar: initialData.calendar || 'work',
+    calendar:
+      initialData.calendar || (categories && Object.keys(categories)[0]) || '',
     type: initialData.type || 'arrangement',
     date: initialData.date || '',
+    endDate: initialData.endDate || initialData.date || '',
     startTime: initialData.startTime || '',
     endTime: initialData.endTime || '',
-    endDate: initialData.endDate || '',
+  });
+
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrence, setRecurrence] = useState({
+    freq: 'DAILY',
+    interval: 1,
+    endType: 'never',
+    until: '',
+    count: null,
   });
 
   useEffect(() => {
     if (isOpen) {
-      const hasEndDate = initialData.endDate && initialData.endDate !== initialData.date;
+      const hasEndDate =
+        initialData.endDate && initialData.endDate !== initialData.date;
       const hasTimeRange = initialData.startTime && initialData.endTime;
 
       let defaultType = 'arrangement';
-      if (hasEndDate) {
-        defaultType = 'fullday';
-      } else if (!hasTimeRange && initialData.date) {
+      if (hasEndDate || hasTimeRange) {
         defaultType = 'arrangement';
       }
 
       setFormData({
         title: initialData.title || '',
-        calendar: initialData.calendar || 'work',
+        calendar:
+          initialData.calendar ||
+          (categories && Object.keys(categories)[0]) ||
+          '',
         type: initialData.type || defaultType,
         date: initialData.date || '',
+        endDate: initialData.endDate || initialData.date || '',
         startTime: initialData.startTime || '',
         endTime: initialData.endTime || '',
-        endDate: initialData.endDate || '',
+      });
+
+      setIsRecurring(false);
+      setRecurrence({
+        freq: 'DAILY',
+        interval: 1,
+        endType: 'never',
+        until: '',
+        count: null,
       });
     }
-  }, [isOpen, initialData.date, initialData.endDate, initialData.startTime, initialData.endTime]);
+  }, [isOpen, initialData, categories]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -56,19 +79,41 @@ const EventModal = ({
     e.preventDefault();
 
     const eventData = {
-      title: formData.title,
-      calendar: formData.calendar,
+      name: formData.title,
+      calendar_id: formData.calendar,
       type: formData.type,
     };
 
-    if (formData.type === 'arrangement') {
-      const startDateTime = `${formData.date}T${formData.startTime}:00`;
-      const endDateTime = `${formData.date}T${formData.endTime}:00`;
-      eventData.start_time = new Date(startDateTime).toISOString();
-      eventData.end_time = new Date(endDateTime).toISOString();
-    } else {
+    if (formData.type === 'task' || formData.type === 'fullday') {
       eventData.start_date = formData.date;
-      eventData.end_date = formData.endDate || formData.date;
+      eventData.end_date = formData.date;
+    } else if (formData.type === 'arrangement') {
+      const startDateTime = `${formData.date}T${formData.startTime}:00`;
+      const endDateTime = `${formData.endDate}T${formData.endTime}:00`;
+
+      const startDateObj = new Date(startDateTime);
+      const endDateObj = new Date(endDateTime);
+
+      if (endDateObj <= startDateObj) {
+        alert('End date/time must be after start date/time');
+        return;
+      }
+
+      eventData.start_date = startDateObj.toISOString();
+      eventData.end_date = endDateObj.toISOString();
+    }
+
+    if (isRecurring) {
+      eventData.recurrence = {
+        freq: recurrence.freq,
+        interval: recurrence.interval,
+      };
+
+      if (recurrence.endType === 'until' && recurrence.until) {
+        eventData.recurrence.until = new Date(recurrence.until).toISOString();
+      } else if (recurrence.endType === 'count' && recurrence.count) {
+        eventData.recurrence.count = recurrence.count;
+      }
     }
 
     if (formData.type === 'task') {
@@ -76,14 +121,15 @@ const EventModal = ({
     }
 
     onSubmit(eventData);
+
     setFormData({
       title: '',
-      calendar: 'work',
+      calendar: (categories && Object.keys(categories)[0]) || '',
       type: 'arrangement',
       date: '',
+      endDate: '',
       startTime: '',
       endTime: '',
-      endDate: '',
     });
     onClose();
   };
@@ -125,52 +171,226 @@ const EventModal = ({
           onChange={handleChange}
           required
         >
-          {Object.entries(categories).map(([key, category]) => (
-            <option key={key} value={key}>
-              {category.name}
-            </option>
-          ))}
+          {categories &&
+            Object.entries(categories).map(([key, category]) => (
+              <option key={key} value={key}>
+                {category.name}
+              </option>
+            ))}
         </CustomSelect>
 
-        <CustomInput
-          type="date"
-          name="date"
-          label="Date"
-          value={formData.date}
-          onChange={handleChange}
-          required
-        />
-
-        {isAllDayEvent && formData.endDate && (
-          <CustomInput
-            type="date"
-            name="endDate"
-            label="End Date"
-            value={formData.endDate}
-            onChange={handleChange}
-          />
+        {(formData.type === 'fullday' || formData.type === 'task') && (
+          <div className="form-group">
+            <label>Date</label>
+            <DatePicker
+              value={formData.date ? dayjs(formData.date) : null}
+              onChange={date => {
+                const dateStr = date ? date.format('YYYY-MM-DD') : '';
+                setFormData(prev => ({
+                  ...prev,
+                  date: dateStr,
+                  endDate: dateStr,
+                }));
+              }}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
+          </div>
         )}
 
-        {isTimedEvent && (
+        {formData.type === 'arrangement' && (
           <>
-            <CustomInput
-              type="time"
-              name="startTime"
-              label="Start Time"
-              value={formData.startTime}
-              onChange={handleChange}
-              required
-            />
+            <div className="row-inputs">
+              <div className="form-group">
+                <label>Start Date</label>
+                <DatePicker
+                  value={formData.date ? dayjs(formData.date) : null}
+                  onChange={date => {
+                    const dateStr = date ? date.format('YYYY-MM-DD') : '';
+                    setFormData(prev => ({ ...prev, date: dateStr }));
+                  }}
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                />
+              </div>
 
-            <CustomInput
-              type="time"
-              name="endTime"
-              label="End Time"
-              value={formData.endTime}
-              onChange={handleChange}
-              required
-            />
+              <div className="form-group">
+                <label>End Date</label>
+                <DatePicker
+                  value={formData.endDate ? dayjs(formData.endDate) : null}
+                  onChange={date => {
+                    const dateStr = date ? date.format('YYYY-MM-DD') : '';
+                    setFormData(prev => ({ ...prev, endDate: dateStr }));
+                  }}
+                  minDate={formData.date ? dayjs(formData.date) : null}
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
+
+            <div className="row-inputs">
+              <div className="form-group">
+                <label>Start Time</label>
+                <TimePicker
+                  value={
+                    formData.startTime
+                      ? dayjs(`2000-01-01 ${formData.startTime}`)
+                      : null
+                  }
+                  onChange={time => {
+                    const timeStr = time ? time.format('HH:mm') : '';
+                    setFormData(prev => ({ ...prev, startTime: timeStr }));
+                  }}
+                  format="HH:mm"
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>End Time</label>
+                <TimePicker
+                  value={
+                    formData.endTime
+                      ? dayjs(`2000-01-01 ${formData.endTime}`)
+                      : null
+                  }
+                  onChange={time => {
+                    const timeStr = time ? time.format('HH:mm') : '';
+                    setFormData(prev => ({ ...prev, endTime: timeStr }));
+                  }}
+                  format="HH:mm"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
           </>
+        )}
+
+        <div className="recurring-section">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={isRecurring}
+              onChange={e => setIsRecurring(e.target.checked)}
+            />
+            <span>Recurring Event</span>
+          </label>
+        </div>
+
+        {isRecurring && (
+          <div className="recurrence-options">
+            <div className="recurrence-row">
+              <CustomSelect
+                id="freq"
+                name="freq"
+                label="Frequency"
+                value={recurrence.freq}
+                onChange={e =>
+                  setRecurrence(prev => ({ ...prev, freq: e.target.value }))
+                }
+              >
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+                <option value="MONTHLY">Monthly</option>
+                <option value="YEARLY">Yearly</option>
+              </CustomSelect>
+
+              <CustomInput
+                type="number"
+                name="interval"
+                label="Repeat Every"
+                value={recurrence.interval}
+                onChange={e =>
+                  setRecurrence(prev => ({
+                    ...prev,
+                    interval: parseInt(e.target.value) || 1,
+                  }))
+                }
+                min="1"
+                placeholder="1"
+              />
+            </div>
+
+            <div className="end-condition-section">
+              <label className="section-label">Ends</label>
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="endType"
+                  value="never"
+                  checked={recurrence.endType === 'never'}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      endType: e.target.value,
+                    }))
+                  }
+                />
+                <span>Never</span>
+              </label>
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="endType"
+                  value="until"
+                  checked={recurrence.endType === 'until'}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      endType: e.target.value,
+                    }))
+                  }
+                />
+                <span>On date</span>
+              </label>
+              {recurrence.endType === 'until' && (
+                <CustomInput
+                  type="date"
+                  name="until"
+                  label=""
+                  value={recurrence.until}
+                  onChange={e =>
+                    setRecurrence(prev => ({ ...prev, until: e.target.value }))
+                  }
+                />
+              )}
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="endType"
+                  value="count"
+                  checked={recurrence.endType === 'count'}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      endType: e.target.value,
+                    }))
+                  }
+                />
+                <span>After</span>
+              </label>
+              {recurrence.endType === 'count' && (
+                <CustomInput
+                  type="number"
+                  name="count"
+                  label=""
+                  value={recurrence.count || ''}
+                  onChange={e =>
+                    setRecurrence(prev => ({
+                      ...prev,
+                      count: parseInt(e.target.value) || null,
+                    }))
+                  }
+                  min="1"
+                  placeholder="Number of occurrences"
+                />
+              )}
+            </div>
+          </div>
         )}
 
         <div className="form-actions">

@@ -7,6 +7,8 @@ import InviteAcceptPage from '@/pages/InviteAcceptPage';
 import AuthLayout from '@/layouts/AuthLayout';
 import ProtectedLayout from '@/layouts/ProtectedLayout';
 import './App.css';
+import ProfilePage from './pages/ProfilePage';
+import ProfileSettingsPage from './pages/ProfileSettingsPage';
 
 function App() {
   const { isAuthenticated, loading } = useAuthContext();
@@ -30,6 +32,8 @@ function App() {
         <Route element={<ProtectedLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/invite/:token" element={<InviteAcceptPage />} />
+          <Route path="/profile" element={<ProfilePage/>} />
+          <Route path="/settings" element={<ProfileSettingsPage/>} />
         </Route>
 
         <Route
