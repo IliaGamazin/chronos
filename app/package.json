@@ -25,6 +25,7 @@
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
+    "countries-and-timezones": "^3.8.0",
     "dayjs": "^1.11.19",
     "lucide-react": "^0.555.0",
     "qs": "^6.14.0",
