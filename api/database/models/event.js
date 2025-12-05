@@ -61,8 +61,8 @@ eventSchema.methods.toDTO = function() {
         extendedProps: {
             description: this.description,
             type: this.type,
-            author: this.author && this.author._id ? this.author : this.author,
-            calendar: this.calendar && this.calendar._id ? this.calendar : this.calendar
+            author: this.author,
+            calendar: this.calendar
         }
     };
 

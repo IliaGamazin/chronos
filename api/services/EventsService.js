@@ -4,6 +4,7 @@ import Event from "../database/models/event.js";
 
 import NotFoundError from "../errors/NotFoundError.js";
 import UnauthorizedError from "../errors/UnauthorizedError.js";
+import {is_holiday_calendar, get_holiday_events} from "./HolidayService.js";
 
 class EventsService {
     async new_event(user_id, body) {
@@ -57,49 +58,71 @@ class EventsService {
         return event.toDTO();
     }
 
-    async get_events(user_id, calendars, from, to) {
-        const calendars_db = await Calendar.find({
-            _id: { $in: calendars }
-        });
+    async get_events(user_id, calendars, from, to, locale) {
+        const regular_calendar_ids = calendars.filter(id => !is_holiday_calendar(id));
+        const holiday_calendar_ids = calendars.filter(id => is_holiday_calendar(id));
 
-        const accessible = calendars_db.filter(calendar => {
-            const isEditor = calendar.editors?.some(id => id.toString() === user_id);
-            const isFollower = calendar.followers?.some(id => id.toString() === user_id);
-            const isAuthor = calendar.author.toString() === user_id;
+        let all_events = [];
 
-            return isEditor || isFollower || isAuthor;
-        });
+        if (regular_calendar_ids.length > 0) {
+            const calendars_db = await Calendar.find({
+                _id: { $in: regular_calendar_ids }
+            });
 
-        if (accessible.length !== calendars.length) {
-            throw new NotFoundError("Access denied or calendar not found");
+            const accessible = calendars_db.filter(calendar => {
+                const is_editor = calendar.editors?.some(id => id.toString() === user_id);
+                const is_follower = calendar.followers?.some(id => id.toString() === user_id);
+                const is_author = calendar.author.toString() === user_id;
+
+                return is_editor || is_follower || is_author;
+            });
+
+            if (accessible.length !== calendars_db.length) {
+                throw new NotFoundError("Access denied or calendar not found");
+            }
+
+            const accessible_calendar_ids = accessible.map(c => c._id);
+            const query_start = new Date(from);
+            const query_end = new Date(to);
+
+            const events = await Event.find({
+                calendar: { $in: accessible_calendar_ids },
+                $or: [
+                    {
+                        "recurrence.freq": { $exists: false },
+                        start_date: { $gte: query_start, $lt: query_end }
+                    },
+                    {
+                        "recurrence.freq": { $exists: true },
+                        start_date: { $lt: query_end },
+                        $or: [
+                            { "recurrence.until": { $exists: false } },
+                            { "recurrence.until": { $gte: query_start } }
+                        ]
+                    }
+                ]
+            })
+                .populate("author", "login email pfp_url")
+                .populate("calendar", "name color");
+
+            all_events = events.map(event => event.toDTO());
         }
 
-        const accessible_calendar_ids = accessible.map(c => c._id);
+        if (holiday_calendar_ids.length > 0) {
+            console.log(holiday_calendar_ids);
 
-        const queryStart = new Date(from);
-        const queryEnd = new Date(to);
+            const query_start = new Date(from);
+            const query_end = new Date(to);
 
-        const events = await Event.find({
-            calendar: { $in: accessible_calendar_ids },
-            $or: [
-                {
-                    "recurrence.freq": { $exists: false },
-                    start_date: { $gte: queryStart, $lt: queryEnd }
-                },
-                {
-                    "recurrence.freq": { $exists: true },
-                    start_date: { $lt: queryEnd },
-                    $or: [
-                        { "recurrence.until": { $exists: false } },
-                        { "recurrence.until": { $gte: queryStart } }
-                    ]
-                }
-            ]
-        })
-            .populate("author", "login email pfp_url")
-            .populate("calendar", "name color");
-
-        return events.map(event => event.toDTO());
+            const holiday_events = get_holiday_events(
+                holiday_calendar_ids,
+                query_start,
+                query_end,
+                locale
+            );
+            all_events = all_events.concat(holiday_events);
+        }
+        return all_events;
     }
 
     async get_event() {

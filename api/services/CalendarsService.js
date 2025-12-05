@@ -5,6 +5,7 @@ import NotFoundError from "../errors/NotFoundError.js";
 import UnauthorizedError from "../errors/UnauthorizedError.js";
 
 import {generate_invite_token, verify_invite_token} from "./JwtService.js";
+import {get_holiday_calendar} from "./HolidayService.js"
 import ConflictError from "../errors/ConflictError.js";
 import ForbiddenError from "../errors/ForbiddenError.js";
 
@@ -50,9 +51,9 @@ class CalendarsService {
         return calendar.toDTO();
     }
 
-    async get_calendars(user_id, status) {
+    async get_calendars(user_id, status, country_code) {
         let query = {};
-
+        console.log(country_code);
         if (status === "owned") {
             query.author = user_id;
         }
@@ -75,7 +76,10 @@ class CalendarsService {
             .populate("editors", "login email pfp_url")
             .populate("followers", "login email pfp_url");
 
-        return calendars.map(calendar => calendar.toDTO());
+        calendars.map(calendar => calendar.toDTO());
+        calendars.push(get_holiday_calendar(country_code));
+
+        return calendars;
     }
 
     async invite_link(user_id, calendar_id, role) {

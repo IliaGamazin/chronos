@@ -2,9 +2,11 @@ import CalendarsService from "../services/CalendarsService.js";
 
 export const get_calendars = async (req, res, next) => {
     try {
+        const country_code = "ru";
         const calendars = await CalendarsService.get_calendars(
             req.user.id,
-            req.query.status
+            req.query.status,
+            country_code
         );
 
         return res.status(200).json({

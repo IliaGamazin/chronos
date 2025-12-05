@@ -1,17 +1,16 @@
 import EventsService from "../services/EventsService.js";
 
 export const get_events = async (req, res, next) => {
-  const locale = req.headers['accept-language']?.split(',')[0] || 'PIVO';
-
-  console.log(locale); // "en-US"
-
   try {
+        const locale = req.headers['accept-language']?.split(',')[0];
+        console.log(locale);
         const calendar_ids = [].concat(req.query.calendars)
         const events = await EventsService.get_events(
             req.user.id,
             calendar_ids,
             req.query.from,
-            req.query.to
+            req.query.to,
+            locale
         );
 
         return res.status(200).json({
