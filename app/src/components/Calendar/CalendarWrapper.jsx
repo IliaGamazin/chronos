@@ -14,17 +14,37 @@ const CalendarWrapper = ({
   categories,
   onCreateEvent,
   isCreatingEvent,
+  userRole = 'follower',
 }) => {
   const calendarRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRange, setSelectedRange] = useState(null);
 
+  const canEdit = userRole === 'owner' || userRole === 'editor';
+
   useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.getApi().refetchEvents();
     }
   }, [categories]);
+
+  const handleEventDrop = info => {
+    console.group('Event Dropped (Moved)');
+    console.log('Event Title:', info.event.title);
+    console.log('New Start:', info.event.startStr);
+    console.log('New End:', info.event.endStr);
+    console.log('All Day:', info.event.allDay);
+    console.groupEnd();
+  };
+
+  const handleEventResize = info => {
+    console.group('Event Resized (Duration Changed)');
+    console.log('Event Title:', info.event.title);
+    console.log('New Start:', info.event.startStr);
+    console.log('New End:', info.event.endStr);
+    console.groupEnd();
+  };
 
   const handleDateClick = dateInfo => {
     setSelectedDate(dateInfo.dateStr);
@@ -34,7 +54,6 @@ const CalendarWrapper = ({
 
   const handleSelect = selectInfo => {
     const { start, end, allDay, startStr, endStr } = selectInfo;
-
     const startDate = startStr.split('T')[0];
 
     if (allDay) {
@@ -64,7 +83,6 @@ const CalendarWrapper = ({
         allDay: false,
       });
     }
-
     setIsModalOpen(true);
   };
 
@@ -81,7 +99,6 @@ const CalendarWrapper = ({
   const renderEventContent = eventInfo => {
     const { event } = eventInfo;
     const isTask = event.extendedProps.type === 'task';
-    const isCompleted = event.extendedProps.completed;
 
     if (!isTask) {
       return (
@@ -97,21 +114,26 @@ const CalendarWrapper = ({
         className="fc-task-content"
         onClick={e => {
           e.stopPropagation();
+          if (!canEdit) return;
           const currentCompleted = event.extendedProps.completed;
           event.setExtendedProp('completed', !currentCompleted);
         }}
+        style={{ cursor: canEdit ? 'pointer' : 'default' }}
       >
         <Checkbox
-          checked={event.done}
+          checked={event.extendedProps.completed}
           onChange={() => {}}
           className="task-checkbox"
+          disabled={!canEdit}
         />
         <div className="fc-event-time">{eventInfo.timeText}</div>
         <div
           className="fc-event-title"
           style={{
-            textDecoration: event.done ? 'line-through' : 'none',
-            opacity: event.done ? 0.7 : 1,
+            textDecoration: event.extendedProps.completed
+              ? 'line-through'
+              : 'none',
+            opacity: event.extendedProps.completed ? 0.7 : 1,
           }}
         >
           {event.title}
@@ -139,15 +161,17 @@ const CalendarWrapper = ({
         }}
         events={eventSource}
         lazyFetching={true}
-        editable={true}
+        editable={canEdit}
+        eventDurationEditable={canEdit}
+        eventStartEditable={canEdit}
+        eventDrop={handleEventDrop}
+        eventResize={handleEventResize}
         selectable={true}
         selectMirror={true}
         dayMaxEvents={true}
         dateClick={handleDateClick}
         select={handleSelect}
         height="100%"
-        eventDurationEditable={true}
-        eventStartEditable={true}
         dragScroll={true}
         snapDuration="00:15:00"
         eventOverlap={true}
