@@ -50,10 +50,15 @@ class EventsService {
             };
         }
 
-        const event = await Event.create(eventData);
+        if (body.type === "task") {
+            eventData.done = false;
+        }
 
+        const event = await Event.create(eventData);
         await event.populate("author", "login email pfp_url");
         await event.populate("calendar", "name color");
+
+        console.log(event);
 
         return event.toDTO();
     }
@@ -105,7 +110,17 @@ class EventsService {
                 .populate("author", "login email pfp_url")
                 .populate("calendar", "name color");
 
-            all_events = events.map(event => event.toDTO());
+            all_events = events.map(event => {
+                const dto = event.toDTO();
+                const calendar = calendars_db.find(c => c._id.toString() === event.calendar._id.toString());
+
+                const is_author = calendar.author.toString() === user_id;
+                const is_editor = calendar.editors?.some(id => id.toString() === user_id);
+
+                dto.editable = is_author || is_editor;
+
+                return dto;
+            });
         }
 
         if (holiday_calendar_ids.length > 0) {

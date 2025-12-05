@@ -102,7 +102,7 @@ const CalendarWrapper = ({
         }}
       >
         <Checkbox
-          checked={isCompleted}
+          checked={event.done}
           onChange={() => {}}
           className="task-checkbox"
         />
@@ -110,8 +110,8 @@ const CalendarWrapper = ({
         <div
           className="fc-event-title"
           style={{
-            textDecoration: isCompleted ? 'line-through' : 'none',
-            opacity: isCompleted ? 0.7 : 1,
+            textDecoration: event.done ? 'line-through' : 'none',
+            opacity: event.done ? 0.7 : 1,
           }}
         >
           {event.title}

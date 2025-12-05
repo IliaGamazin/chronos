@@ -17,6 +17,8 @@ const eventSchema = new mongoose.Schema({
     end_date: { type: Date, required: true },
     timezone: { type: String, default: "UTC" },
 
+    done: { type: Boolean, default: false },
+
     recurrence: {
         freq: {
             type: String,
@@ -56,6 +58,7 @@ eventSchema.methods.toDTO = function() {
         title: this.name,
         start: startVal,
         end: endVal,
+        done: this.done,
         allDay: this.type === 'fullday' || this.type === 'task',
 
         extendedProps: {

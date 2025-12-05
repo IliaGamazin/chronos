@@ -88,8 +88,18 @@ const EventModal = ({
       eventData.start_date = formData.date;
       eventData.end_date = formData.date;
     } else if (formData.type === 'arrangement') {
-      const startDateTime = `${formData.date}T${formData.startTime}:00`;
-      const endDateTime = `${formData.endDate}T${formData.endTime}:00`;
+      const isISOWithTime = formData.date.includes('T') && formData.date.length > 10;
+      let startDateTime, endDateTime;
+
+      if (isISOWithTime) {
+          startDateTime = formData.date.split('T')[0] + 'T' + formData.startTime + ':00';
+          endDateTime = formData.endDate.split('T')[0] + 'T' + formData.endTime + ':00';
+      } else {
+          startDateTime = `${formData.date}T${formData.startTime}:00`;
+          endDateTime = `${formData.endDate}T${formData.endTime}:00`;
+      }
+
+      console.log(startDateTime, endDateTime);
 
       const startDateObj = new Date(startDateTime);
       const endDateObj = new Date(endDateTime);

@@ -28,8 +28,7 @@ export const get_holiday_calendar = (country_code) => {
         timezone: "UTC",
         editors: [],
         followers: [],
-        is_holiday_calendar: true,
-        is_read_only: true
+        role: "follower"
     };
 }
 
@@ -95,7 +94,7 @@ export const map_holidays_to_events = (holidays, calendar_id, timezone = 'UTC') 
             end: endStr,
 
             allDay: true,
-
+            editable: false,
             extendedProps: {
                 description: "Public holiday",
                 type: "fullday",

@@ -76,10 +76,25 @@ class CalendarsService {
             .populate("editors", "login email pfp_url")
             .populate("followers", "login email pfp_url");
 
-        calendars.map(calendar => calendar.toDTO());
-        calendars.push(get_holiday_calendar(country_code));
+        const calendars_with_role = calendars.map(calendar => {
+            const dto = calendar.toDTO();
 
-        return calendars;
+            if (calendar.author._id.toString() === user_id.toString()) {
+                dto.role = "owner";
+            }
+            else if (calendar.editors.some(editor => editor._id.toString() === user_id.toString())) {
+                dto.role = "editor";
+            }
+            else if (calendar.followers.some(follower => follower._id.toString() === user_id.toString())) {
+                dto.role = "follower";
+            }
+
+            return dto;
+        });
+
+        calendars_with_role.push(get_holiday_calendar(country_code));
+
+        return calendars_with_role;
     }
 
     async invite_link(user_id, calendar_id, role) {
