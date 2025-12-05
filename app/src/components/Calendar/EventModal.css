@@ -117,3 +117,38 @@
   cursor: pointer;
   accent-color: #3b82f6;
 }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.row-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .row-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group .ant-picker {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.form-group .ant-picker-input > input {
+  font-size: 0.9375rem;
+  color: #374151;
+}

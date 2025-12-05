@@ -18,8 +18,8 @@ class UsersService {
             throw new NotFoundError("No user with id");
         }
 
-        if (body?.login) {
-            const existing = await User.find({ login: body.login });
+        if (body?.login && body.login !== user.login) {
+            const existing = await User.findOne({ login: body.login });
             if (existing) {
                 throw new ConflictError("Login already taken");
             }

@@ -54,9 +54,11 @@ const CalendarWrapper = ({
     } else {
       const startTime = start.toTimeString().slice(0, 5);
       const endTime = end.toTimeString().slice(0, 5);
+      const endDate = endStr.split('T')[0];
 
       setSelectedDate(startDate);
       setSelectedRange({
+        endDate: endDate,
         startTime,
         endTime,
         allDay: false,
@@ -158,9 +160,9 @@ const CalendarWrapper = ({
         isSubmitting={isCreatingEvent}
         initialData={{
           date: selectedDate,
+          endDate: selectedRange?.endDate || selectedDate,
           startTime: selectedRange?.startTime,
           endTime: selectedRange?.endTime,
-          endDate: selectedRange?.endDate,
         }}
         categories={categories}
       />

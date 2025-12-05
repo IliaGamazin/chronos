@@ -22,7 +22,7 @@ class EventsService {
 
         const start = new Date(body.start_date);
         const end = new Date(body.end_date);
-        if (start >= end) {
+        if (start > end) {
             throw new Error("End date must be after start date");
         }
 

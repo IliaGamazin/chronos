@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { DatePicker, TimePicker } from 'antd';
+import dayjs from 'dayjs';
 import Modal from '@/shared/Modal';
 import CustomInput from '@/shared/CustomInput';
 import CustomSelect from '@/shared/CustomSelect';
@@ -19,9 +21,9 @@ const EventModal = ({
       initialData.calendar || (categories && Object.keys(categories)[0]) || '',
     type: initialData.type || 'arrangement',
     date: initialData.date || '',
+    endDate: initialData.endDate || initialData.date || '',
     startTime: initialData.startTime || '',
     endTime: initialData.endTime || '',
-    endDate: initialData.endDate || '',
   });
 
   const [isRecurring, setIsRecurring] = useState(false);
@@ -40,9 +42,7 @@ const EventModal = ({
       const hasTimeRange = initialData.startTime && initialData.endTime;
 
       let defaultType = 'arrangement';
-      if (hasEndDate) {
-        defaultType = 'fullday';
-      } else if (!hasTimeRange && initialData.date) {
+      if (hasEndDate || hasTimeRange) {
         defaultType = 'arrangement';
       }
 
@@ -54,9 +54,9 @@ const EventModal = ({
           '',
         type: initialData.type || defaultType,
         date: initialData.date || '',
+        endDate: initialData.endDate || initialData.date || '',
         startTime: initialData.startTime || '',
         endTime: initialData.endTime || '',
-        endDate: initialData.endDate || '',
       });
 
       setIsRecurring(false);
@@ -84,21 +84,19 @@ const EventModal = ({
       type: formData.type,
     };
 
-    if (formData.type === 'arrangement') {
+    if (formData.type === 'task' || formData.type === 'fullday') {
+      eventData.start_date = formData.date;
+      eventData.end_date = formData.date;
+    } else if (formData.type === 'arrangement') {
       const startDateTime = `${formData.date}T${formData.startTime}:00`;
-      const endDateTime = `${formData.date}T${formData.endTime}:00`;
+      const endDateTime = `${formData.endDate}T${formData.endTime}:00`;
 
-      eventData.start_date = new Date(startDateTime).toISOString();
-      eventData.end_date = new Date(endDateTime).toISOString();
-    } else {
-      const startDateObj = new Date(formData.date);
-
-      let endDateObj = formData.endDate
-        ? new Date(formData.endDate)
-        : new Date(formData.date);
+      const startDateObj = new Date(startDateTime);
+      const endDateObj = new Date(endDateTime);
 
       if (endDateObj <= startDateObj) {
-        endDateObj.setDate(startDateObj.getDate() + 1);
+        alert('End date/time must be after start date/time');
+        return;
       }
 
       eventData.start_date = startDateObj.toISOString();
@@ -129,9 +127,9 @@ const EventModal = ({
       calendar: (categories && Object.keys(categories)[0]) || '',
       type: 'arrangement',
       date: '',
+      endDate: '',
       startTime: '',
       endTime: '',
-      endDate: '',
     });
     onClose();
   };
@@ -181,45 +179,91 @@ const EventModal = ({
             ))}
         </CustomSelect>
 
-        <CustomInput
-          type="date"
-          name="date"
-          label="Date"
-          value={formData.date}
-          onChange={handleChange}
-          required
-        />
-
-        {isAllDayEvent && (
-          <CustomInput
-            type="date"
-            name="endDate"
-            label="End Date (Optional)"
-            value={formData.endDate}
-            onChange={handleChange}
-            placeholder="Leave empty for 1 day"
-          />
+        {(formData.type === 'fullday' || formData.type === 'task') && (
+          <div className="form-group">
+            <label>Date</label>
+            <DatePicker
+              value={formData.date ? dayjs(formData.date) : null}
+              onChange={date => {
+                const dateStr = date ? date.format('YYYY-MM-DD') : '';
+                setFormData(prev => ({
+                  ...prev,
+                  date: dateStr,
+                  endDate: dateStr,
+                }));
+              }}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
+          </div>
         )}
 
-        {isTimedEvent && (
+        {formData.type === 'arrangement' && (
           <>
-            <CustomInput
-              type="time"
-              name="startTime"
-              label="Start Time"
-              value={formData.startTime}
-              onChange={handleChange}
-              required
-            />
+            <div className="row-inputs">
+              <div className="form-group">
+                <label>Start Date</label>
+                <DatePicker
+                  value={formData.date ? dayjs(formData.date) : null}
+                  onChange={date => {
+                    const dateStr = date ? date.format('YYYY-MM-DD') : '';
+                    setFormData(prev => ({ ...prev, date: dateStr }));
+                  }}
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                />
+              </div>
 
-            <CustomInput
-              type="time"
-              name="endTime"
-              label="End Time"
-              value={formData.endTime}
-              onChange={handleChange}
-              required
-            />
+              <div className="form-group">
+                <label>End Date</label>
+                <DatePicker
+                  value={formData.endDate ? dayjs(formData.endDate) : null}
+                  onChange={date => {
+                    const dateStr = date ? date.format('YYYY-MM-DD') : '';
+                    setFormData(prev => ({ ...prev, endDate: dateStr }));
+                  }}
+                  minDate={formData.date ? dayjs(formData.date) : null}
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
+
+            <div className="row-inputs">
+              <div className="form-group">
+                <label>Start Time</label>
+                <TimePicker
+                  value={
+                    formData.startTime
+                      ? dayjs(`2000-01-01 ${formData.startTime}`)
+                      : null
+                  }
+                  onChange={time => {
+                    const timeStr = time ? time.format('HH:mm') : '';
+                    setFormData(prev => ({ ...prev, startTime: timeStr }));
+                  }}
+                  format="HH:mm"
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>End Time</label>
+                <TimePicker
+                  value={
+                    formData.endTime
+                      ? dayjs(`2000-01-01 ${formData.endTime}`)
+                      : null
+                  }
+                  onChange={time => {
+                    const timeStr = time ? time.format('HH:mm') : '';
+                    setFormData(prev => ({ ...prev, endTime: timeStr }));
+                  }}
+                  format="HH:mm"
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
           </>
         )}
 
