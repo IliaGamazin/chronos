@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Mail } from 'lucide-react';
 import IconButton from '@/shared/IconButton';
+import CustomButton from '@/shared/CustomButton';
 import CalendarListItem from './CalendarListItem';
 import InviteModal from './InviteModal';
 import CalendarModal from './CalendarModal';
@@ -13,6 +14,7 @@ const CalendarSidebar = ({
   onCreateInvite,
   isCreatingInvite,
   onOpenCalendarSettings,
+  setIsModalOpen,
 }) => {
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -49,6 +51,14 @@ const CalendarSidebar = ({
 
   return (
     <aside className="calendar-sidebar">
+      <CustomButton
+          onClick={() => setIsModalOpen(true)}
+          title="Create invitation"
+          variant="secondary"  
+      >
+        Create Event 
+        <Plus size={12}/>
+      </CustomButton>
       <div className="sidebar-header">
         <h3>Calendars</h3>
         <div className="sidebar-actions">
