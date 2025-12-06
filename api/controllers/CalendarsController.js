@@ -100,6 +100,21 @@ export const invite_accept = async (req, res, next) => {
     }
 }
 
+export const invite_mail = async (req, res, next) => {
+    try {
+        await CalendarsService.invite_mail(
+            req.user.login,
+            req.body.email,
+            req.body.link
+        );
+
+        return res.status(201).send();
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
 export const update_calendar = async (req, res, next) => {
     try {
         const calendar = await CalendarsService.update_calendar(
