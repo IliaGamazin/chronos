@@ -6,6 +6,7 @@ import UnauthorizedError from "../errors/UnauthorizedError.js";
 
 import {generate_invite_token, verify_invite_token} from "./JwtService.js";
 import {get_holiday_calendar} from "./HolidayService.js"
+import {send_invite_link} from "./MailService.js"
 import ConflictError from "../errors/ConflictError.js";
 import ForbiddenError from "../errors/ForbiddenError.js";
 
@@ -158,6 +159,10 @@ class CalendarsService {
                 $addToSet: { followers: user_id }
             });
         }
+    }
+
+    async invite_mail(from, to, link) {
+        await send_invite_link(from, to, link);
     }
 
     async update_calendar(user_id, calendar_id, body) {
