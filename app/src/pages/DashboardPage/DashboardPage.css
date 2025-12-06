@@ -26,7 +26,10 @@
 
 .welcome-text {
   font-size: 0.875rem;
-  color: #111827;
+  color: #5f6368;
+  font-weight: 400;
+  padding-right: 8px;
+  border-right: 1px solid #dadce0;
 }
 
 .logout-button {

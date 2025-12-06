@@ -15,9 +15,10 @@ const CalendarWrapper = ({
   onCreateEvent,
   isCreatingEvent,
   userRole = 'follower',
+  isModalOpen,
+  setIsModalOpen,
 }) => {
   const calendarRef = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRange, setSelectedRange] = useState(null);
 
@@ -26,6 +27,7 @@ const CalendarWrapper = ({
   useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.getApi().refetchEvents();
+      console.log(eventSource)
     }
   }, [categories]);
 
@@ -108,6 +110,8 @@ const CalendarWrapper = ({
         </div>
       );
     }
+
+    console.log(eventSource)
 
     return (
       <div

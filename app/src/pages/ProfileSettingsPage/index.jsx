@@ -106,6 +106,7 @@ const ProfileSettingsPage = () => {
         error={error}
       />
 
+    <div className="logout-danger-zone">
       <div className="logout-section">
         <CustomButton 
             variant="danger" 
@@ -114,7 +115,9 @@ const ProfileSettingsPage = () => {
           >
           Logout
         </CustomButton>
-      </div>
+      </div>      
+    </div>
+
     </div>
   );
 };
