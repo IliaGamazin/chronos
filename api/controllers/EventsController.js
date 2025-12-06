@@ -3,7 +3,6 @@ import EventsService from "../services/EventsService.js";
 export const get_events = async (req, res, next) => {
   try {
         const locale = req.headers['accept-language']?.split(',')[0];
-        console.log(locale);
         const calendar_ids = [].concat(req.query.calendars)
         const events = await EventsService.get_events(
             req.user.id,
@@ -98,3 +97,16 @@ export const delete_event = async (req, res, next) => {
         next(error);
     }
 };
+
+export const toggle_task = async (req, res, next) => {
+    try {
+        await EventsService.toggle_task(
+            req.params.event_id
+        );
+
+        return res.status(201).send();
+    }
+    catch (error) {
+        next(error);
+    }
+}

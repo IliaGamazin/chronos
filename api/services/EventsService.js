@@ -5,6 +5,7 @@ import Event from "../database/models/event.js";
 import NotFoundError from "../errors/NotFoundError.js";
 import UnauthorizedError from "../errors/UnauthorizedError.js";
 import {is_holiday_calendar, get_holiday_events} from "./HolidayService.js";
+import ForbiddenError from "../errors/ForbiddenError.js";
 
 class EventsService {
     async new_event(user_id, body) {
@@ -138,6 +139,20 @@ class EventsService {
             all_events = all_events.concat(holiday_events);
         }
         return all_events;
+    }
+
+    async toggle_task(event_id) {
+        const event = await Event.findById(event_id);
+        if (!event) {
+            throw new NotFoundError("Event id not found");
+        }
+
+        if (event.type !== "task") {
+            throw new ForbiddenError("You can only toggle tasks");
+        }
+
+        event.done = !event.done;
+        await event.save();
     }
 
     async get_event() {
