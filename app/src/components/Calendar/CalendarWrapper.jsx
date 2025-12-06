@@ -27,7 +27,6 @@ const CalendarWrapper = ({
   useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.getApi().refetchEvents();
-      console.log(eventSource)
     }
   }, [categories]);
 
@@ -110,8 +109,6 @@ const CalendarWrapper = ({
         </div>
       );
     }
-
-    console.log(eventSource)
 
     return (
       <div

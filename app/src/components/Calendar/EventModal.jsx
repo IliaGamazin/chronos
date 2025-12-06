@@ -99,10 +99,16 @@ const EventModal = ({
           endDateTime = `${formData.endDate}T${formData.endTime}:00`;
       }
 
-      console.log(startDateTime, endDateTime);
-
       const startDateObj = new Date(startDateTime);
       const endDateObj = new Date(endDateTime);
+      console.log(startDateObj, endDateObj)
+      const now = new Date();
+      now.setSeconds(0, 0);
+
+      if (startDateObj < now) {
+        alert('Cannot create events with start date/time in the past');
+        return;
+      }
 
       if (endDateObj <= startDateObj) {
         alert('End date/time must be after start date/time');

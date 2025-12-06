@@ -202,8 +202,6 @@ const DashboardPage = () => {
     );
   }
 
-  console.log(visibleEvents);
-
   if (error) {
     return (
       <div className="dashboard">
