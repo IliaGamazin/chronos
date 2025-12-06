@@ -60,6 +60,7 @@ const DashboardPage = () => {
   const [categories, setCategories] = useState({});
   const [currentView, setCurrentView] = useState('calendar');
   const [selectedCalendarForEdit, setSelectedCalendarForEdit] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (calendarsData?.data) {
@@ -164,6 +165,7 @@ const DashboardPage = () => {
         backgroundColor: category?.color || '#3788d8',
         borderColor: category?.color || '#3788d8',
         textColor: '#ffffff',
+        display: "block",
       };
     });
 
@@ -199,6 +201,8 @@ const DashboardPage = () => {
       </div>
     );
   }
+
+  console.log(visibleEvents);
 
   if (error) {
     return (
@@ -264,6 +268,7 @@ const DashboardPage = () => {
             onCreateInvite={createInviteMutation.mutateAsync}
             isCreatingInvite={createInviteMutation.isPending}
             onOpenCalendarSettings={handleOpenCalendarSettings}
+            setIsModalOpen={setIsModalOpen}
           />
           {currentView === 'calendar' ? (
             <CalendarWrapper
@@ -271,6 +276,8 @@ const DashboardPage = () => {
               categories={categories}
               onCreateEvent={createEventMutation.mutate}
               isCreatingEvent={createEventMutation.isPending}
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
             />
           ) : (
             <CalendarSettings

@@ -6,6 +6,11 @@
   box-shadow: none;
   overflow-y: auto;
   min-height: 0;
+  position: relative;
+  background: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,20 Q300,10 600,50 T1200,50 L1200,120 L0,120 Z' fill='%23f0f9ff' opacity='0.8'/%3E%3C/svg%3E") no-repeat bottom,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 Q300,30 600,70 T1200,70 L1200,120 L0,120 Z' fill='%23dbeafe' opacity='1.0'/%3E%3C/svg%3E") no-repeat bottom;
+  background-size: 100% 100%, 100% 100%;
 }
 
 .settings-header {
@@ -28,6 +33,10 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  max-width: 680px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 15px
 }
 
 .settings-section {
@@ -64,6 +73,7 @@
   background: #f0f9ff;
   padding: 20px;
   border-radius: 8px;
+
 }
 
 .color-input-group {
@@ -88,6 +98,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #d1d5db;
 }
 
 .info-item {
