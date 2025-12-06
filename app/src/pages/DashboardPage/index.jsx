@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
-import { useEvents, useCreateEvent } from '@/hooks/useEvents';
+import {
+  useEvents,
+  useCreateEvent,
+  useUpdateEvent,
+  useDeleteEvent,
+} from '@/hooks/useEvents';
 import {
   useCalendars,
   useCreateCalendar,
@@ -16,6 +21,7 @@ import CustomButton from '@/shared/CustomButton';
 import CalendarWrapper from '@/components/Calendar/CalendarWrapper';
 import CalendarSidebar from '@/components/Calendar/CalendarSidebar';
 import CalendarSettings from '@/components/Calendar/CalendarSettings';
+import EventSettings from '@/components/Calendar/EventSettings';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
@@ -32,9 +38,6 @@ const DashboardPage = () => {
   const calendarIds =
     calendarsData?.data?.map(cal => cal.id || cal._id).filter(Boolean) || [];
 
-  console.log('[Dashboard] Valid Calendar IDs:', calendarIds);
-  console.log('[Dashboard] Raw Calendars Data:', calendarsData?.data);
-
   const now = new Date();
   const fromDate = new Date(now.getFullYear() - 5, 0, 1).toISOString();
   const toDate = new Date(now.getFullYear() + 5, 0, 1).toISOString();
@@ -50,6 +53,9 @@ const DashboardPage = () => {
   });
 
   const createEventMutation = useCreateEvent();
+  const updateEventMutation = useUpdateEvent();
+  const deleteEventMutation = useDeleteEvent();
+
   const createCalendarMutation = useCreateCalendar();
   const createInviteMutation = useCreateInvite();
   const updateCalendarMutation = useUpdateCalendar();
@@ -60,6 +66,7 @@ const DashboardPage = () => {
   const [categories, setCategories] = useState({});
   const [currentView, setCurrentView] = useState('calendar');
   const [selectedCalendarForEdit, setSelectedCalendarForEdit] = useState(null);
+  const [selectedEventForEdit, setSelectedEventForEdit] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -103,6 +110,7 @@ const DashboardPage = () => {
   const handleBackToCalendar = () => {
     setCurrentView('calendar');
     setSelectedCalendarForEdit(null);
+    setSelectedEventForEdit(null);
   };
 
   const handleUpdateCalendar = updateData => {
@@ -125,25 +133,55 @@ const DashboardPage = () => {
 
   const handleDeleteCalendar = calendarId => {
     deleteCalendarMutation.mutate(calendarId, {
-      onSuccess: () => {
-        handleBackToCalendar();
-      },
-      onError: error => {
-        console.error('[Dashboard] Delete failed:', error);
-      },
+      onSuccess: () => handleBackToCalendar(),
     });
   };
 
   const handleUnfollowCalendar = calendarId => {
     unfollowCalendarMutation.mutate(calendarId, {
+      onSuccess: () => handleBackToCalendar(),
+    });
+  };
+
+  const handleRemoveCollaborator = data => {
+    removeCollaboratorMutation.mutate(data);
+  };
+
+  const handleEventEditRequest = event => {
+    setSelectedEventForEdit(event);
+    setCurrentView('event-settings');
+  };
+
+  const handleUpdateEvent = ({ eventId, eventData }) => {
+    updateEventMutation.mutate(
+      { eventId, eventData },
+      {
+        onSuccess: () => {
+          const updatedEvent = {
+            ...selectedEventForEdit,
+            title: eventData.name,
+            backgroundColor: eventData.color,
+          };
+          setSelectedEventForEdit(updatedEvent);
+        },
+      }
+    );
+  };
+
+  const handleDeleteEvent = eventId => {
+    deleteEventMutation.mutate(eventId, {
       onSuccess: () => {
         handleBackToCalendar();
       },
     });
   };
 
-  const handleRemoveCollaborator = data => {
-    removeCollaboratorMutation.mutate(data);
+  const canEditEvent = event => {
+    if (!event) return false;
+    const calendarData = event.extendedProps?.calendar;
+    const calId = calendarData?._id || calendarData?.id || calendarData;
+    const role = categories[calId]?.role;
+    return role === 'owner' || role === 'editor';
   };
 
   const events = eventsData?.data || [];
@@ -165,74 +203,22 @@ const DashboardPage = () => {
         backgroundColor: category?.color || '#3788d8',
         borderColor: category?.color || '#3788d8',
         textColor: '#ffffff',
-        display: "block",
+        display: 'block',
       };
     });
 
-  const isLoading = calendarsLoading;
-  const error = calendarsError;
-
-  if (isLoading) {
+  if (calendarsLoading)
     return (
       <div className="dashboard">
-        <header className="dashboard-header">
-          <h1>Chronos Dashboard</h1>
-          <div className="user-info">
-            <span className="welcome-text">Welcome, {user?.full_name}!</span>
-            <CustomButton
-              onClick={logout}
-              variant="secondary"
-              className="logout-button"
-            >
-              Logout
-            </CustomButton>
-            <CustomButton 
-              onClick={() => navigate("/profile")} 
-              variant="secondary" 
-              className="profile-button"
-              >
-              Profile
-            </CustomButton>
-          </div>
-        </header>
-        <main className="dashboard-content">
-          <div className="loading-message">Loading events...</div>
-        </main>
+        <div className="loading-message">Loading...</div>
       </div>
     );
-  }
-
-  if (error) {
+  if (calendarsError)
     return (
       <div className="dashboard">
-        <header className="dashboard-header">
-          <h1>Chronos Dashboard</h1>
-          <div className="user-info">
-            <span className="welcome-text">Welcome, {user?.full_name}!</span>
-            <CustomButton
-              onClick={logout}
-              variant="secondary"
-              className="logout-button"
-            >
-              Logout
-            </CustomButton>
-            <CustomButton 
-              onClick={() => navigate("/profile")} 
-              variant="secondary" 
-              className="profile-button"
-              >
-              Profile
-            </CustomButton>
-          </div>
-        </header>
-        <main className="dashboard-content">
-          <div className="error-message">
-            Error loading events: {error.message}
-          </div>
-        </main>
+        <div className="error-message">Error: {calendarsError.message}</div>
       </div>
     );
-  }
 
   return (
     <div className="dashboard">
@@ -247,13 +233,13 @@ const DashboardPage = () => {
           >
             Logout
           </CustomButton>
-          <CustomButton 
-          onClick={() => navigate("/profile")} 
-          variant="secondary" 
-          className="profile-button"
+          <CustomButton
+            onClick={() => navigate('/profile')}
+            variant="secondary"
+            className="profile-button"
           >
-          Profile
-        </CustomButton>
+            Profile
+          </CustomButton>
         </div>
       </header>
       <main className="dashboard-content">
@@ -268,7 +254,8 @@ const DashboardPage = () => {
             onOpenCalendarSettings={handleOpenCalendarSettings}
             setIsModalOpen={setIsModalOpen}
           />
-          {currentView === 'calendar' ? (
+
+          {currentView === 'calendar' && (
             <CalendarWrapper
               eventSource={visibleEvents}
               categories={categories}
@@ -276,8 +263,11 @@ const DashboardPage = () => {
               isCreatingEvent={createEventMutation.isPending}
               isModalOpen={isModalOpen}
               setIsModalOpen={setIsModalOpen}
+              onEventEditRequest={handleEventEditRequest}
             />
-          ) : (
+          )}
+
+          {currentView === 'settings' && selectedCalendarForEdit && (
             <CalendarSettings
               calendar={selectedCalendarForEdit}
               onBack={handleBackToCalendar}
@@ -289,6 +279,18 @@ const DashboardPage = () => {
               isDeleting={deleteCalendarMutation.isPending}
               isUnfollowing={unfollowCalendarMutation.isPending}
               isRemovingCollaborator={removeCollaboratorMutation.isPending}
+            />
+          )}
+
+          {currentView === 'event-settings' && selectedEventForEdit && (
+            <EventSettings
+              event={selectedEventForEdit}
+              onBack={handleBackToCalendar}
+              onUpdate={handleUpdateEvent}
+              onDelete={handleDeleteEvent}
+              isUpdating={updateEventMutation.isPending}
+              isDeleting={deleteEventMutation.isPending}
+              canEdit={canEditEvent(selectedEventForEdit)}
             />
           )}
         </div>

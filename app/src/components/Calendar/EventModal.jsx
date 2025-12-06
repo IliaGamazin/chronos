@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import Modal from '@/shared/Modal';
 import CustomInput from '@/shared/CustomInput';
 import CustomSelect from '@/shared/CustomSelect';
+import CustomTextarea from '@/shared/CustomTextarea';
 import CustomButton from '@/shared/CustomButton';
 import './EventModal.css';
 
@@ -17,6 +18,7 @@ const EventModal = ({
 }) => {
   const [formData, setFormData] = useState({
     title: initialData.title || '',
+    description: initialData.description || '',
     calendar:
       initialData.calendar || (categories && Object.keys(categories)[0]) || '',
     type: initialData.type || 'arrangement',
@@ -48,6 +50,7 @@ const EventModal = ({
 
       setFormData({
         title: initialData.title || '',
+        description: initialData.description || '',
         calendar:
           initialData.calendar ||
           (categories && Object.keys(categories)[0]) ||
@@ -80,6 +83,7 @@ const EventModal = ({
 
     const eventData = {
       name: formData.title,
+      description: formData.description,
       calendar_id: formData.calendar,
       type: formData.type,
     };
@@ -88,20 +92,22 @@ const EventModal = ({
       eventData.start_date = formData.date;
       eventData.end_date = formData.date;
     } else if (formData.type === 'arrangement') {
-      const isISOWithTime = formData.date.includes('T') && formData.date.length > 10;
+      const isISOWithTime =
+        formData.date.includes('T') && formData.date.length > 10;
       let startDateTime, endDateTime;
 
       if (isISOWithTime) {
-          startDateTime = formData.date.split('T')[0] + 'T' + formData.startTime + ':00';
-          endDateTime = formData.endDate.split('T')[0] + 'T' + formData.endTime + ':00';
+        startDateTime =
+          formData.date.split('T')[0] + 'T' + formData.startTime + ':00';
+        endDateTime =
+          formData.endDate.split('T')[0] + 'T' + formData.endTime + ':00';
       } else {
-          startDateTime = `${formData.date}T${formData.startTime}:00`;
-          endDateTime = `${formData.endDate}T${formData.endTime}:00`;
+        startDateTime = `${formData.date}T${formData.startTime}:00`;
+        endDateTime = `${formData.endDate}T${formData.endTime}:00`;
       }
 
       const startDateObj = new Date(startDateTime);
       const endDateObj = new Date(endDateTime);
-      console.log(startDateObj, endDateObj)
       const now = new Date();
       now.setSeconds(0, 0);
 
@@ -140,6 +146,7 @@ const EventModal = ({
 
     setFormData({
       title: '',
+      description: '',
       calendar: (categories && Object.keys(categories)[0]) || '',
       type: 'arrangement',
       date: '',
@@ -149,9 +156,6 @@ const EventModal = ({
     });
     onClose();
   };
-
-  const isTimedEvent = formData.type === 'arrangement';
-  const isAllDayEvent = formData.type === 'fullday' || formData.type === 'task';
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create Event">
@@ -164,6 +168,15 @@ const EventModal = ({
           onChange={handleChange}
           placeholder="Event title"
           required
+        />
+
+        <CustomTextarea
+          name="description"
+          label="Description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Add details..."
+          rows={3}
         />
 
         <CustomSelect
