@@ -293,14 +293,14 @@
   will-change: transform;
 }
 
-.fc-daygrid-event-harness {
-  max-width: 220px;
-}
-
 .fc-daygrid-event-harness .fc-event-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fc-popover-body .fc-daygrid-event-harness {
+  max-width: 220px;
 }
 
 .fc-event .fc-event-title {
