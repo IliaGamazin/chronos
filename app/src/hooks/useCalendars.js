@@ -1,10 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarsApi } from '@/api/calendarsApi';
+import { getUserLocale } from '@/utils/localeUtils';
 
 export const useCalendars = filters => {
+  const locale = getUserLocale();
+
   return useQuery({
-    queryKey: ['calendars', filters],
-    queryFn: () => calendarsApi.getCalendars(filters),
+    queryKey: ['calendars', filters, locale],
+    queryFn: () => calendarsApi.getCalendars({ ...filters, locale }),
   });
 };
 
@@ -43,9 +46,11 @@ export const useDeleteCalendar = () => {
 };
 
 export const useCalendar = calendarId => {
+  const locale = getUserLocale();
+
   return useQuery({
-    queryKey: ['calendar', calendarId],
-    queryFn: () => calendarsApi.getCalendar(calendarId),
+    queryKey: ['calendar', calendarId, locale],
+    queryFn: () => calendarsApi.getCalendar(calendarId, { locale }),
     enabled: !!calendarId,
   });
 };

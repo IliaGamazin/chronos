@@ -2,7 +2,7 @@ import CalendarsService from "../services/CalendarsService.js";
 
 export const get_calendars = async (req, res, next) => {
     try {
-        const country_code = "ru";
+        const country_code = req.query.locale || req.headers['accept-language']?.split(',')[0];
         const calendars = await CalendarsService.get_calendars(
             req.user.id,
             req.query.status,
