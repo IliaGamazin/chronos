@@ -214,28 +214,27 @@ class EventsService {
             event.type = body.type;
         }
 
-        if (!event?.recurrence.freq) {
-            const eventType = body.type || event.type;
+        const eventType = body.type || event.type;
 
-            if (body.start_date) {
-                if (eventType === 'fullday' || eventType === 'task' || body.allDay) {
-                    const date = new Date(body.start_date);
-                    event.start_date = date.toISOString().split('T')[0];
-                }
-                else {
-                    event.start_date = new Date(body.start_date).toISOString();
-                }
+        if (body.start_date) {
+            if (eventType === 'fullday' || eventType === 'task' || body.allDay) {
+                const date = new Date(body.start_date);
+                event.start_date = date.toISOString().split('T')[0];
             }
-
-            if (body.end_date) {
-                if (eventType === 'fullday' || eventType === 'task' || body.allDay) {
-                    const date = new Date(body.end_date);
-                    event.end_date = date.toISOString().split('T')[0];
-                } else {
-                    event.end_date = new Date(body.end_date).toISOString();
-                }
+            else {
+                event.start_date = new Date(body.start_date).toISOString();
             }
         }
+
+        if (body.end_date) {
+            if (eventType === 'fullday' || eventType === 'task' || body.allDay) {
+                const date = new Date(body.end_date);
+                event.end_date = date.toISOString().split('T')[0];
+            } else {
+                event.end_date = new Date(body.end_date).toISOString();
+            }
+        }
+
 
         console.log(event);
 
