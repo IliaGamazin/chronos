@@ -59,8 +59,6 @@ class EventsService {
         await event.populate("author", "login email pfp_url");
         await event.populate("calendar", "name color");
 
-        console.log(event);
-
         return event.toDTO();
     }
 
@@ -125,8 +123,6 @@ class EventsService {
         }
 
         if (holiday_calendar_ids.length > 0) {
-            console.log(holiday_calendar_ids);
-
             const query_start = new Date(from);
             const query_end = new Date(to);
 

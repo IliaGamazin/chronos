@@ -4,6 +4,7 @@ const {RRule} = pkg;
 
 import Event from "../database/models/event.js";
 import Reminder from "../database/models/reminder.js";
+import {send_reminder} from "./MailService.js";
 
 const POLL_INTERVAL_MINUTES = 1;
 
@@ -53,9 +54,9 @@ class CronService {
         reminders_to_send.push(...fullday_reminders);
 
         console.log(`Found ${reminders_to_send.length} reminders to send`);
-        reminders_to_send.forEach((reminder) => {
-            console.log(reminder)
-        })
+        for (const reminder of reminders_to_send) {
+            await send_reminder(reminder);
+        }
     }
 
     async get_timed_events(now, in_fifteen_minutes) {

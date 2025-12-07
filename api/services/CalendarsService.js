@@ -54,7 +54,6 @@ class CalendarsService {
 
     async get_calendars(user_id, status, country_code) {
         let query = {};
-        console.log(country_code);
         if (status === "owned") {
             query.author = user_id;
         }
