@@ -81,7 +81,7 @@ const CalendarWrapper = ({
       info.revert();
       return;
     }
-    console.log('Event Dropped:', info.event.title);
+    console.log('Event Dropped:', info.event);
 
     updateEventMutation.mutate({
       eventId: info.event.id,
