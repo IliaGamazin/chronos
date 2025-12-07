@@ -260,7 +260,10 @@ const EventSettings = ({
                         }));
                       }}
                       format="YYYY-MM-DD"
-                      style={{ width: '100%' }}
+                      style={{ 
+                        width: '100%',
+                        background: "none",
+                       }}
                       allowClear={false}
                     />
                   </div>
@@ -287,7 +290,10 @@ const EventSettings = ({
                         }}
                         minDate={formData.date ? dayjs(formData.date) : null}
                         format="YYYY-MM-DD"
-                        style={{ width: '100%' }}
+                        style={{ 
+                          width: '100%',
+                          background: "none",
+                         }}
                         allowClear={false}
                       />
                     </div>
@@ -328,7 +334,10 @@ const EventSettings = ({
                           }));
                         }}
                         format="HH:mm"
-                        style={{ width: '100%' }}
+                        style={{
+                          width: '100%',
+                          background: "none",
+                        }}
                         allowClear={false}
                       />
                     </div>
@@ -354,42 +363,15 @@ const EventSettings = ({
                           setFormData(prev => ({ ...prev, endTime: timeStr }));
                         }}
                         format="HH:mm"
-                        style={{ width: '100%' }}
+                        style={{
+                          width: '100%',
+                          background: "none",
+                        }}
                         allowClear={false}
                       />
                     </div>
                   </div>
                 )}
-
-                <div className="color-input-group">
-                  <label>Color</label>
-                  <div
-                    className="color-picker-wrapper"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                    }}
-                  >
-                    <input
-                      type="color"
-                      value={formData.color}
-                      onChange={e =>
-                        setFormData({ ...formData, color: e.target.value })
-                      }
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        border: 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                      }}
-                    />
-                    <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                      {formData.color}
-                    </span>
-                  </div>
-                </div>
 
                 <div className="form-actions">
                   <CustomButton
