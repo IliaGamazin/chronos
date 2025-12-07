@@ -8,6 +8,7 @@ import router from "./routers/BaseRouter.js";
 import { createServer } from "node:http";
 import { config } from "dotenv";
 import { error_handler } from "./middleware/ErrorHandler.js";
+import CronService from "./services/CronService.js";
 
 config();
 await mongoose.connect(process.env.DB_CONNECTION);
@@ -27,6 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 app.use(error_handler);
 
+const cron_service = new CronService();
+
 http.listen(process.env.PORT, () => {
     console.log("Listening on " + process.env.PORT);
+    cron_service.start();
 });
