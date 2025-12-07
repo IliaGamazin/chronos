@@ -91,7 +91,12 @@ export const update_event = async (req, res, next) => {
 
 export const delete_event = async (req, res, next) => {
     try {
+        await EventsService.delete_event(
+            req.user.id,
+            req.params.event_id,
+        );
 
+        return res.status(204).send();
     }
     catch (error) {
         next(error);
