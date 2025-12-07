@@ -212,11 +212,13 @@ const EventModal = ({
           required
         >
           {categories &&
-            Object.entries(categories).map(([key, category]) => (
-              <option key={key} value={key}>
-                {category.name}
-              </option>
-            ))}
+            Object.entries(categories)
+              .filter(([key, category]) => category.role !== 'follower')
+              .map(([key, category]) => (
+                <option key={key} value={key}>
+                  {category.name}
+                </option>
+              ))}
         </CustomSelect>
 
         {(formData.type === 'fullday' || formData.type === 'task') && (
