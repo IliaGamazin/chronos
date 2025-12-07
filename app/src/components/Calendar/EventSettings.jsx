@@ -14,8 +14,8 @@ const EventSettings = ({
   onBack,
   onUpdate,
   onDelete,
-  isUpdating,
   isDeleting,
+  isUpdating,
   canEdit,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -260,10 +260,10 @@ const EventSettings = ({
                         }));
                       }}
                       format="YYYY-MM-DD"
-                      style={{ 
+                      style={{
                         width: '100%',
-                        background: "none",
-                       }}
+                        background: 'none',
+                      }}
                       allowClear={false}
                     />
                   </div>
@@ -290,10 +290,10 @@ const EventSettings = ({
                         }}
                         minDate={formData.date ? dayjs(formData.date) : null}
                         format="YYYY-MM-DD"
-                        style={{ 
+                        style={{
                           width: '100%',
-                          background: "none",
-                         }}
+                          background: 'none',
+                        }}
                         allowClear={false}
                       />
                     </div>
@@ -336,7 +336,7 @@ const EventSettings = ({
                         format="HH:mm"
                         style={{
                           width: '100%',
-                          background: "none",
+                          background: 'none',
                         }}
                         allowClear={false}
                       />
@@ -365,7 +365,7 @@ const EventSettings = ({
                         format="HH:mm"
                         style={{
                           width: '100%',
-                          background: "none",
+                          background: 'none',
                         }}
                         allowClear={false}
                       />

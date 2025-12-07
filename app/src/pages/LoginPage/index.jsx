@@ -18,7 +18,7 @@ const LOGIN_FIELDS = [
 ];
 
 const LoginPage = () => {
-  const { login, isLoggingIn, loginError } = useAuth();
+  const { login, isLoggingIn } = useAuth();
 
   const handleSubmit = formData => {
     login(formData);
@@ -32,7 +32,6 @@ const LoginPage = () => {
       loadingText="Logging in..."
       onSubmit={handleSubmit}
       isLoading={isLoggingIn}
-      error={loginError}
       footer={
         <p>
           Don't have an account? <Link to="/register">Sign up</Link>

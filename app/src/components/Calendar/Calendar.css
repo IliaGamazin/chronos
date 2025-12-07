@@ -555,3 +555,85 @@
   position: relative;
   z-index: 1;
 }
+
+.fc .fc-daygrid-day-top {
+  flex-direction: row;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .calendar-wrapper {
+    flex-direction: column;
+  }
+
+  .calendar-sidebar {
+    width: 100% !important;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .fc-header-toolbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px !important;
+  }
+
+  .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .fc-button {
+    padding: 0.3em 0.5em !important;
+    font-size: 0.85em !important;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.25em !important;
+  }
+
+  .calendar-container {
+    height: auto !important;
+    min-height: 600px;
+    display: block;
+    overflow: visible;
+  }
+
+  .fc {
+    height: auto !important;
+    min-height: 600px;
+  }
+
+  .fc-daygrid-day-frame {
+    min-height: 60px !important;
+  }
+
+  .fc-daygrid-event {
+    font-size: 10px !important;
+    padding: 1px !important;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 12px !important;
+    padding: 2px !important;
+  }
+
+  .fc-timegrid-slot-label-cushion {
+    font-size: 11px !important;
+  }
+
+  .fc-col-header-cell-cushion {
+    font-size: 12px !important;
+  }
+}

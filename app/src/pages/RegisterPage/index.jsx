@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthForm from '@/components/AuthForm/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
+import toast from 'react-hot-toast';
 
 const REGISTER_FIELDS = [
   {
@@ -37,18 +37,16 @@ const REGISTER_FIELDS = [
 ];
 
 const RegisterPage = () => {
-  const { register, isRegistering, registerError } = useAuth();
-  const [validationError, setValidationError] = useState(null);
+  const { register, isRegistering } = useAuth();
 
   const handleSubmit = formData => {
-    setValidationError(null);
-
     if (formData.password !== formData.confirmPassword) {
-      setValidationError({ message: 'Passwords do not match' });
+      toast.error('Passwords do not match');
       return;
     }
 
     const { confirmPassword, ...registerData } = formData;
+
     register(registerData);
   };
 
@@ -60,7 +58,6 @@ const RegisterPage = () => {
       loadingText="Creating account..."
       onSubmit={handleSubmit}
       isLoading={isRegistering}
-      error={validationError || registerError}
       footer={
         <p>
           Already have an account? <Link to="/login">Log in</Link>

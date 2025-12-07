@@ -18,6 +18,17 @@ export const calendarsApi = {
     return response.data;
   },
 
+  invite: async ({ calendarId, role }) => {
+    const response = await axiosInstance.post(
+      `/calendars/${calendarId}/invite`,
+      {},
+      {
+        params: { role },
+      }
+    );
+    return response.data;
+  },
+
   updateCalendar: async ({ calendarId, calendarData }) => {
     const response = await axiosInstance.patch(
       `/calendars/${calendarId}`,

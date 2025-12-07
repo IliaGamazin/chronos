@@ -1,17 +1,16 @@
 import { useAuthContext } from '@/context/AuthContext';
-import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 import CustomButton from '@/shared/CustomButton';
-import IconButton from '@/shared/IconButton';
+import DashboardHeader from '@/components/Header/Header.jsx';
 
-import "./ProfilePage.css";
+import './ProfilePage.css';
 
-const ProfilePage = () => {
-  const { user } = useAuthContext();
-  const navigate = useNavigate();
+const ProfileAvatar = ({ user }) => {
+  if (!user) return null;
 
-  const getInitials = (name) => {
+  const getInitials = name => {
     if (!name) return '?';
     return name
       .split(' ')
@@ -22,39 +21,50 @@ const ProfilePage = () => {
   };
 
   return (
+    <div className="profile-avatar">
+      {user?.pfp_url ? (
+        <img src={user.pfp_url} alt="Profile" />
+      ) : (
+        <span>{getInitials(user?.full_name)}</span>
+      )}
+    </div>
+  );
+};
+
+const ProfilePage = () => {
+  const { user } = useAuthContext();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  return (
     <div className="profile-page">
       <div className="profile-container">
-        <div className="profile-header">
-          <IconButton 
-            onClick={() => navigate("/dashboard")} 
-            variant="secondary" 
-            title="Back to dashboard"
-          >
-            <ArrowLeft size={20} />
-          </IconButton>
-          <h1 className="profile-title">Profile</h1>
-        </div>
-        
+        <DashboardHeader hideAvatar={true} />
+
         <div className="profile-content">
           <div className="profile-card">
-            <div className="profile-avatar">
-              {user?.pfp_url ? (
-                <img src={user.pfp_url} alt="Profile" />
-              ) : (
-                <span>{getInitials(user?.full_name)}</span>
-              )}
-            </div>
+            <ProfileAvatar user={user} />
 
             <h2 className="profile-name">{user?.full_name}</h2>
             <p className="profile-username">@{user?.login}</p>
             <p className="profile-email">{user?.email}</p>
 
-            <CustomButton 
-              className="profile-settings-button" 
-              onClick={() => navigate("/settings")}
-            >
-              Edit Profile
-            </CustomButton>
+            <div className="profile-actions">
+              <CustomButton
+                className="profile-settings-button"
+                onClick={() => navigate('/settings')}
+              >
+                Edit Profile
+              </CustomButton>
+
+              <CustomButton
+                className="profile-logout-button"
+                variant="danger"
+                onClick={logout}
+              >
+                Logout
+              </CustomButton>
+            </div>
           </div>
         </div>
       </div>

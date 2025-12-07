@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/context/AuthContext';
-import { useAuth } from '@/hooks/useAuth';
+import Header from '@/components/Header/Header.jsx';
+
 import {
   useEvents,
   useCreateEvent,
@@ -15,9 +15,10 @@ import {
   useDeleteCalendar,
   useUnfollowCalendar,
   useRemoveCollaborator,
+  useCreateInvite,
+  useSendInviteEmail,
 } from '@/hooks/useCalendars';
-import { useCreateInvite } from '@/hooks/useInvites';
-import CustomButton from '@/shared/CustomButton';
+
 import CalendarWrapper from '@/components/Calendar/CalendarWrapper';
 import CalendarSidebar from '@/components/Calendar/CalendarSidebar';
 import CalendarSettings from '@/components/Calendar/CalendarSettings';
@@ -26,14 +27,8 @@ import './DashboardPage.css';
 
 const DashboardPage = () => {
   const { user } = useAuthContext();
-  const { logout } = useAuth();
-  const navigate = useNavigate();
 
-  const {
-    data: calendarsData,
-    isLoading: calendarsLoading,
-    error: calendarsError,
-  } = useCalendars();
+  const { data: calendarsData, isLoading: calendarsLoading } = useCalendars();
 
   const calendarIds =
     calendarsData?.data?.map(cal => cal.id || cal._id).filter(Boolean) || [];
@@ -42,11 +37,7 @@ const DashboardPage = () => {
   const fromDate = new Date(now.getFullYear() - 5, 0, 1).toISOString();
   const toDate = new Date(now.getFullYear() + 5, 0, 1).toISOString();
 
-  const {
-    data: eventsData,
-    isLoading: eventsLoading,
-    error: eventsError,
-  } = useEvents({
+  const { data: eventsData, isLoading: eventsLoading } = useEvents({
     calendars: calendarIds,
     from: fromDate,
     to: toDate,
@@ -58,6 +49,8 @@ const DashboardPage = () => {
 
   const createCalendarMutation = useCreateCalendar();
   const createInviteMutation = useCreateInvite();
+  const sendInviteEmailMutation = useSendInviteEmail();
+
   const updateCalendarMutation = useUpdateCalendar();
   const deleteCalendarMutation = useDeleteCalendar();
   const unfollowCalendarMutation = useUnfollowCalendar();
@@ -213,35 +206,11 @@ const DashboardPage = () => {
         <div className="loading-message">Loading...</div>
       </div>
     );
-  if (calendarsError)
-    return (
-      <div className="dashboard">
-        <div className="error-message">Error: {calendarsError.message}</div>
-      </div>
-    );
 
   return (
     <div className="dashboard">
-      <header className="dashboard-header">
-        <h1>Chronos Dashboard</h1>
-        <div className="user-info">
-          <span className="welcome-text">Welcome, {user?.full_name}!</span>
-          <CustomButton
-            onClick={logout}
-            variant="secondary"
-            className="logout-button"
-          >
-            Logout
-          </CustomButton>
-          <CustomButton
-            onClick={() => navigate('/profile')}
-            variant="secondary"
-            className="profile-button"
-          >
-            Profile
-          </CustomButton>
-        </div>
-      </header>
+      <Header />
+
       <main className="dashboard-content">
         <div className="calendar-wrapper">
           <CalendarSidebar
@@ -250,7 +219,11 @@ const DashboardPage = () => {
             onCreateCalendar={createCalendarMutation.mutate}
             isCreatingCalendar={createCalendarMutation.isPending}
             onCreateInvite={createInviteMutation.mutateAsync}
-            isCreatingInvite={createInviteMutation.isPending}
+            onSendInviteEmail={sendInviteEmailMutation.mutateAsync}
+            isCreatingInvite={
+              createInviteMutation.isPending ||
+              sendInviteEmailMutation.isPending
+            }
             onOpenCalendarSettings={handleOpenCalendarSettings}
             setIsModalOpen={setIsModalOpen}
           />
@@ -288,8 +261,8 @@ const DashboardPage = () => {
               onBack={handleBackToCalendar}
               onUpdate={handleUpdateEvent}
               onDelete={handleDeleteEvent}
-              isUpdating={updateEventMutation.isPending}
               isDeleting={deleteEventMutation.isPending}
+              isUpdating={updateEventMutation.isPending}
               canEdit={canEditEvent(selectedEventForEdit)}
             />
           )}
