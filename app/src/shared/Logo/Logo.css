@@ -1,0 +1,30 @@
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
+.logo-image {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.logo-text span {
+  color: inherit;
+}

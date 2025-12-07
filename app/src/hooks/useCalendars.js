@@ -22,6 +22,16 @@ export const useCreateCalendar = () => {
   });
 };
 
+export const useCreateInvite = () => {
+  return useMutation({
+    mutationKey: ['createInvite'],
+    mutationFn: calendarsApi.invite,
+    onError: error => {
+      console.error('Failed to generate invite token:', error);
+    },
+  });
+};
+
 export const useUpdateCalendar = () => {
   const queryClient = useQueryClient();
 

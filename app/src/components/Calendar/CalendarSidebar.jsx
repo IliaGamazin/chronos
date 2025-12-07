@@ -11,8 +11,11 @@ const CalendarSidebar = ({
   onToggleCategory,
   onCreateCalendar,
   isCreatingCalendar,
+
   onCreateInvite,
+  onSendInviteEmail,
   isCreatingInvite,
+
   onOpenCalendarSettings,
   setIsModalOpen,
 }) => {
@@ -25,19 +28,40 @@ const CalendarSidebar = ({
     setIsCalendarModalOpen(false);
   };
 
-  const handleCreateInvite = inviteData => {
-    onCreateInvite(inviteData)
-      .then(response => {
-        const token = response?.data || response?.data?.data;
+  const handleCreateInvite = async inviteData => {
+    try {
+      const safeRole = (inviteData.role || 'follower').toLowerCase();
 
-        if (token && typeof token === 'string') {
-          const link = `${window.location.origin}/invite/${token}`;
-          setInviteLink(link);
-        }
-      })
-      .catch(error => {
-        console.error('Failed to create invite:', error);
+      const response = await onCreateInvite({
+        calendarId: inviteData.calendar,
+        role: safeRole,
       });
+
+      const token = response.data || response;
+
+      if (token && typeof token === 'string') {
+        const link = `${window.location.origin}/invite/${token}`;
+        setInviteLink(link);
+
+        if (inviteData.email && inviteData.email.trim() !== '') {
+          await onSendInviteEmail({
+            email: inviteData.email,
+            link: link,
+          });
+          alert(`Invitation sent to ${inviteData.email}`);
+        }
+      } else {
+        console.error('Token not found in response', response);
+      }
+    } catch (error) {
+      console.error('Failed to create invite:', error);
+
+      if (error.response?.data?.error?.message) {
+        alert(`Error: ${error.response.data.error.message}`);
+      } else {
+        alert('Error creating invitation. Please check console.');
+      }
+    }
   };
 
   const handleCloseInviteModal = () => {
@@ -52,13 +76,13 @@ const CalendarSidebar = ({
   return (
     <aside className="calendar-sidebar">
       <CustomButton
-          onClick={() => setIsModalOpen(true)}
-          title="Create invitation"
-          variant="secondary"  
+        onClick={() => setIsModalOpen(true)}
+        title="Create Event"
+        variant="secondary"
       >
-        Create Event 
-        <Plus size={12}/>
+        Create Event
       </CustomButton>
+
       <div className="sidebar-header">
         <h3>Calendars</h3>
         <div className="sidebar-actions">
@@ -78,6 +102,7 @@ const CalendarSidebar = ({
           </IconButton>
         </div>
       </div>
+
       <ul className="calendar-list">
         {Object.entries(categories).map(([key, category]) => (
           <CalendarListItem
@@ -89,12 +114,14 @@ const CalendarSidebar = ({
           />
         ))}
       </ul>
+
       <CalendarModal
         isOpen={isCalendarModalOpen}
         onClose={() => setIsCalendarModalOpen(false)}
         onSubmit={handleCreateCalendar}
         isSubmitting={isCreatingCalendar}
       />
+
       <InviteModal
         isOpen={isInviteModalOpen}
         onClose={handleCloseInviteModal}

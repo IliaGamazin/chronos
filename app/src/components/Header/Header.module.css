@@ -1,10 +1,3 @@
-.dashboard {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-}
-
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -19,19 +12,6 @@
 .dashboard-header h1 {
   font-size: 1.25rem;
   margin: 0;
-}
-
-.dashboard-content {
-  flex: 1;
-  padding: 0;
-  overflow: hidden;
-  position: relative;
-}
-
-.calendar-wrapper {
-  display: flex;
-  height: 100%;
-  width: 100%;
 }
 
 .header-user-avatar {
@@ -68,23 +48,6 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard {
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
-  }
-
-  .dashboard-content {
-    height: auto;
-    overflow: visible;
-    flex: none;
-  }
-
-  .calendar-wrapper {
-    flex-direction: column;
-    height: auto;
-  }
-
   .dashboard-header {
     padding: 0.5rem 1rem;
     position: sticky;

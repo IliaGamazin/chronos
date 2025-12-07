@@ -1,19 +1,15 @@
 import { useAuthContext } from '@/context/AuthContext';
-import { ArrowLeft, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 
-import CustomButton from '@/shared/CustomButton';
-import IconButton from '@/shared/IconButton';
+import DashboardHeader from '@/components/Header/Header.jsx';
 
-import "@/pages/ProfilePage/ProfilePage.css";
+import '@/pages/ProfilePage/ProfilePage.css';
 import { useEffect, useState } from 'react';
-import ProfileSettingsForm from "@/components/Profile/ProfileSettingsForm";
-import { useSetUserAvatar, useUpdateUser } from '../../hooks/useUser';
+import ProfileSettingsForm from '@/components/Profile/ProfileSettingsForm';
+import { useSetUserAvatar, useUpdateUser } from '@/hooks/useUser.js';
 
 const ProfileSettingsPage = () => {
   const { user } = useAuthContext();
-  const { logout } = useAuth();
   const navigate = useNavigate();
   const { updateUser } = useAuthContext();
 
@@ -26,21 +22,21 @@ const ProfileSettingsPage = () => {
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    login: user.login || "",
-    full_name: user.full_name || "",
-    email: user.email || "",
+    login: user.login || '',
+    full_name: user.full_name || '',
+    email: user.email || '',
   });
 
   useEffect(() => {
     setAvatar(user?.pfp_url);
   }, [user]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = e => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -51,26 +47,23 @@ const ProfileSettingsPage = () => {
   const applyAvatar = async () => {
     if (!avatarFile) return;
     try {
-     await onSetUserAvatar.mutateAsync({
-        pfp_url: avatarFile
+      await onSetUserAvatar.mutateAsync({
+        pfp_url: avatarFile,
       });
     } catch (err) {
-      setError(err.message);  
+      setError(err.message);
     }
-    console.log("Uploaded avatar:", avatarFile);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setIsSaving(true);
-    console.log("Current form:", formData);
     try {
       const updated = await onUpdateUser.mutateAsync({
         userData: formData,
       });
-      console.log(updated)
-      updateUser({ ...user, ...formData, });
-      navigate("/dashboard");
+      updateUser({ ...user, ...formData });
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response.data.error.message);
     }
@@ -80,44 +73,22 @@ const ProfileSettingsPage = () => {
 
   return (
     <div className="profile-page">
-      <div className="profile-header">
-        <IconButton
-          onClick={() => navigate("/profile")}
-          variant="secondary"
-          title="Back to profile"
-        >
-          <ArrowLeft size={20} />
-        </IconButton>
-        <h1 className="profile-title">Profile Settings</h1>
+      <DashboardHeader hideAvatar={true} />
+
+      <div className="profile-container">
+        <ProfileSettingsForm
+          userFullName={formData.full_name}
+          userLogin={formData.login}
+          userAvatar={avatar}
+          onUserFullNameChange={handleChange}
+          onUserLoginChange={handleChange}
+          onUserAvatarChange={handleAvatarChange}
+          onSubmitAvatar={applyAvatar}
+          onSubmit={handleSubmit}
+          isSaving={isSaving}
+          error={error}
+        />
       </div>
-
-      <ProfileSettingsForm
-        userFullName={formData.full_name}
-        userLogin={formData.login}
-        //userEmail={formData.email}
-        userAvatar={avatar}
-        onUserFullNameChange={handleChange}
-        onUserLoginChange={handleChange}
-        //onUserEmailChange={handleChange}
-        onUserAvatarChange={handleAvatarChange}
-        onSubmitAvatar={applyAvatar}
-        onSubmit={handleSubmit}
-        isSaving={isSaving}
-        error={error}
-      />
-
-    <div className="logout-danger-zone">
-      <div className="logout-section">
-        <CustomButton 
-            variant="danger" 
-            className="logout-btn" 
-            onClick={logout}
-          >
-          Logout
-        </CustomButton>
-      </div>      
-    </div>
-
     </div>
   );
 };

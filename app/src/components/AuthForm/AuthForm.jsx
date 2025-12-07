@@ -3,6 +3,7 @@ import CustomInput from '@/shared/CustomInput';
 import CustomButton from '@/shared/CustomButton';
 import { formatErrorMessage } from '@/utils/errorUtils';
 import styles from './AuthForm.module.css';
+import Logo from '@/shared/Logo/Logo.jsx';
 
 const AuthForm = ({
   title,
@@ -30,6 +31,9 @@ const AuthForm = ({
 
   return (
     <div className={styles.authFormContainer}>
+      <div className={styles.logoWrapper}>
+        <Logo />
+      </div>
       <div className={styles.authFormCard}>
         <h1 className={styles.title}>{title}</h1>
 
