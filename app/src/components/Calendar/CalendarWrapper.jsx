@@ -76,38 +76,60 @@ const CalendarWrapper = ({
     setIsDetailsOpen(false);
   };
 
-  const handleEventDrop = info => {
-    if (!checkEventPermission(info.event)) {
-      info.revert();
-      return;
+    const getLocalDateString = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const handleEventDrop = info => {
+        if (!checkEventPermission(info.event)) {
+            info.revert();
+            return;
+        }
+
+        const eventData = {
+            allDay: info.event.allDay,
+        };
+
+        if (info.event.allDay) {
+            eventData.start_date = getLocalDateString(info.event.start);
+            eventData.end_date = getLocalDateString(info.event.end || info.event.start);
+        } else {
+            eventData.start_date = info.event.start.toISOString();
+            eventData.end_date = (info.event.end || info.event.start).toISOString();
+        }
+
+        updateEventMutation.mutate({
+            eventId: info.event.id,
+            eventData,
+        });
+    };
+
+    const handleEventResize = info => {
+        if (!checkEventPermission(info.event)) {
+            info.revert();
+            return;
+        }
+
+        const eventData = {
+            allDay: info.event.allDay,
+        };
+
+        if (info.event.allDay) {
+            eventData.start_date = getLocalDateString(info.event.start);
+            eventData.end_date = getLocalDateString(info.event.end || info.event.start);
+        } else {
+            eventData.start_date = info.event.start.toISOString();
+            eventData.end_date = (info.event.end || info.event.start).toISOString();
+        }
+
+        updateEventMutation.mutate({
+            eventId: info.event.id,
+            eventData,
+        });
     }
-    console.log('Event Dropped:', info.event.title);
-
-    updateEventMutation.mutate({
-      eventId: info.event.id,
-      eventData: {
-        start_date: info.event.start,
-        end_date: info.event.end || info.event.start,
-        allDay: info.event.allDay,
-      },
-    });
-  };
-
-  const handleEventResize = info => {
-    if (!checkEventPermission(info.event)) {
-      info.revert();
-      return;
-    }
-    console.log('Event Resized:', info.event.title);
-
-    updateEventMutation.mutate({
-      eventId: info.event.id,
-      eventData: {
-        start_date: info.event.start,
-        end_date: info.event.end,
-      },
-    });
-  };
 
   const handleDateClick = dateInfo => {
     setSelectedDate(dateInfo.dateStr);

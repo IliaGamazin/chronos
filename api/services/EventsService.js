@@ -177,6 +177,75 @@ class EventsService {
         await Event.findByIdAndDelete(event_id);
     }
 
+    async update_event(user_id, event_id, body) {
+        console.log(body);
+
+        const event = await Event.findById(event_id);
+        if (!event) {
+            throw new NotFoundError("No event with id");
+        }
+
+        const user = await User.findById(user_id);
+        if (!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        const calendar = await Calendar.findById(event.calendar.toString());
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
+
+        const is_author = calendar.author.toString() === user_id.toString();
+        const is_editor = calendar.editors.some(id => id.toString() === user_id.toString());
+
+        if (!is_author && !is_editor) {
+            throw new ForbiddenError("Insufficient permissions");
+        }
+
+        if (body.title && event.name !== body.title) {
+            event.name = body.title;
+        }
+
+        if (body.description && event.description !== body.description) {
+            event.description = body.description;
+        }
+
+        if (body.type && event.type !== body.type) {
+            event.type = body.type;
+        }
+
+        const eventType = body.type || event.type;
+
+        if (body.start_date) {
+            if (eventType === 'fullday' || eventType === 'task' || body.allDay) {
+                const date = new Date(body.start_date);
+                event.start_date = date.toISOString().split('T')[0];
+            }
+            else {
+                event.start_date = new Date(body.start_date).toISOString();
+            }
+        }
+
+        if (body.end_date) {
+            if (eventType === 'fullday' || eventType === 'task' || body.allDay) {
+                const date = new Date(body.end_date);
+                event.end_date = date.toISOString().split('T')[0];
+            } else {
+                event.end_date = new Date(body.end_date).toISOString();
+            }
+        }
+
+
+        console.log(event);
+
+        await event.save();
+        await event.populate("author", "login email pfp_url");
+        await event.populate("calendar", "name color");
+
+        return event.toDTO();
+    }
+
+
     async get_event() {
 
     }

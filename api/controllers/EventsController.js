@@ -82,7 +82,16 @@ export const new_event = async (req, res, next) => {
 
 export const update_event = async (req, res, next) => {
     try {
+        const event = await EventsService.update_event(
+            req.user.id,
+            req.params.event_id,
+            req.body
+        );
 
+        return res.status(200).json({
+            success: true,
+            data: event
+        });
     }
     catch (error) {
         next(error);
