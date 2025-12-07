@@ -35,7 +35,8 @@ const AuthForm = ({
       <div className={styles.authFormCard}>
         <h1 className={styles.title}>{title}</h1>
 
-        {/* УДАЛЕН БЛОК ОТОБРАЖЕНИЯ ОШИБОК */}
+        {/* A MOJET I NET, TOAST CARRIES */}
+        {/* LASST ES SEIN */}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {fields.map(field => (
