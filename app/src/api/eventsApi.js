@@ -5,7 +5,8 @@ export const eventsApi = {
   getEvents: async filters => {
     const response = await axiosInstance.get('/events', {
       params: filters,
-      paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
+      paramsSerializer: params =>
+        qs.stringify(params, { arrayFormat: 'repeat' }),
     });
     return response.data;
   },
@@ -22,6 +23,11 @@ export const eventsApi = {
 
   updateEvent: async ({ eventId, eventData }) => {
     const response = await axiosInstance.patch(`/events/${eventId}`, eventData);
+    return response.data;
+  },
+
+  toggleTask: async eventId => {
+    const response = await axiosInstance.post(`/events/${eventId}/toggle_task`);
     return response.data;
   },
 

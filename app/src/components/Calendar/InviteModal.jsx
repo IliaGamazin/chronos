@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Mail } from 'lucide-react';
 import Modal from '@/shared/Modal';
 import CustomSelect from '@/shared/CustomSelect';
 import CustomButton from '@/shared/CustomButton';
@@ -7,10 +7,18 @@ import CustomInput from '@/shared/CustomInput';
 import IconButton from '@/shared/IconButton';
 import './InviteModal.css';
 
-const InviteModal = ({ isOpen, onClose, onSubmit, isSubmitting, categories, inviteLink }) => {
+const InviteModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isSubmitting,
+  categories,
+  inviteLink,
+}) => {
   const [formData, setFormData] = useState({
     calendar: '',
     role: 'follower',
+    email: '',
   });
   const [copied, setCopied] = useState(false);
 
@@ -20,6 +28,7 @@ const InviteModal = ({ isOpen, onClose, onSubmit, isSubmitting, categories, invi
       setFormData({
         calendar: firstCalendar,
         role: 'follower',
+        email: '',
       });
       setCopied(false);
     }
@@ -43,8 +52,11 @@ const InviteModal = ({ isOpen, onClose, onSubmit, isSubmitting, categories, invi
     }
   };
 
+  const isEmailMode = formData.email.trim().length > 0;
+  const buttonText = isEmailMode ? 'Send Invitation' : 'Get Invite Link';
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create Invitation">
+    <Modal isOpen={isOpen} onClose={onClose} title="Invite People">
       <form onSubmit={handleSubmit} className="invite-form">
         <CustomSelect
           id="calendar"
@@ -64,7 +76,7 @@ const InviteModal = ({ isOpen, onClose, onSubmit, isSubmitting, categories, invi
         <CustomSelect
           id="role"
           name="role"
-          label="Role"
+          label="Permission"
           value={formData.role}
           onChange={handleChange}
           required
@@ -73,23 +85,53 @@ const InviteModal = ({ isOpen, onClose, onSubmit, isSubmitting, categories, invi
           <option value="editor">Editor</option>
         </CustomSelect>
 
+        {!inviteLink && (
+          <div className="email-input-wrapper">
+            <CustomInput
+              type="email"
+              name="email"
+              label="Email Address (Optional)"
+              placeholder="Leave empty to generate a link only"
+              value={formData.email}
+              onChange={handleChange}
+              icon={<Mail size={16} />}
+            />
+          </div>
+        )}
+
         {inviteLink && (
           <div className="invite-link-container">
-            <CustomInput
-              type="text"
-              name="invite-link"
-              label="Invitation Link"
-              value={inviteLink}
-              readOnly
-            />
-            <IconButton
-              onClick={handleCopyLink}
-              variant="primary"
-              title={copied ? 'Copied!' : 'Copy link'}
-              className="copy-link-btn"
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'flex-end',
+                width: '100%',
+              }}
             >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-            </IconButton>
+              <CustomInput
+                type="text"
+                name="invite-link"
+                label="Invitation Link"
+                value={inviteLink}
+                readOnly
+                containerStyle={{ flex: 1, width: '100%' }}
+              />
+              <IconButton
+                onClick={handleCopyLink}
+                variant="primary"
+                title={copied ? 'Copied!' : 'Copy link'}
+                className="copy-link-btn"
+                style={{
+                  height: '42px',
+                  width: '42px',
+                  flexShrink: 0,
+                  marginBottom: '2px',
+                }}
+              >
+                {copied ? <Check size={18} /> : <Copy size={18} />}
+              </IconButton>
+            </div>
           </div>
         )}
 
@@ -100,11 +142,20 @@ const InviteModal = ({ isOpen, onClose, onSubmit, isSubmitting, categories, invi
             variant="secondary"
             disabled={isSubmitting}
           >
-            {inviteLink ? 'Close' : 'Cancel'}
+            {inviteLink ? 'Done' : 'Cancel'}
           </CustomButton>
+
           {!inviteLink && (
-            <CustomButton type="submit" variant="primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Invitation'}
+            <CustomButton
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? isEmailMode
+                  ? 'Sending...'
+                  : 'Generating...'
+                : buttonText}
             </CustomButton>
           )}
         </div>

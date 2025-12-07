@@ -47,6 +47,14 @@ export const calendarsApi = {
     return response.data || { success: true };
   },
 
+  sendInviteEmail: async ({ email, link }) => {
+    const response = await axiosInstance.post('/calendars/invite/mail', {
+      email,
+      link,
+    });
+    return response.data;
+  },
+
   removeCollaborator: async ({ calendarId, userId }) => {
     const response = await axiosInstance.delete(
       `/calendars/${calendarId}/${userId}`

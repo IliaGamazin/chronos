@@ -7,6 +7,12 @@ import listPlugin from '@fullcalendar/list';
 import rrulePlugin from '@fullcalendar/rrule';
 import Checkbox from '@/shared/Checkbox';
 import EventModal from './EventModal';
+import EventDetailsModal from './EventDetailsModal';
+import {
+  useToggleTask,
+  useUpdateEvent,
+  useDeleteEvent,
+} from '@/hooks/useEvents';
 import './Calendar.css';
 
 const CalendarWrapper = ({
@@ -14,15 +20,19 @@ const CalendarWrapper = ({
   categories,
   onCreateEvent,
   isCreatingEvent,
-  userRole = 'follower',
   isModalOpen,
   setIsModalOpen,
+  onEventEditRequest,
 }) => {
   const calendarRef = useRef(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRange, setSelectedRange] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const canEdit = userRole === 'owner' || userRole === 'editor';
+  const toggleTaskMutation = useToggleTask();
+  const updateEventMutation = useUpdateEvent();
+  const deleteEventMutation = useDeleteEvent();
 
   useEffect(() => {
     if (calendarRef.current) {
@@ -30,21 +40,73 @@ const CalendarWrapper = ({
     }
   }, [categories]);
 
+  const checkEventPermission = event => {
+    if (!event) return false;
+
+    const calData = event.extendedProps?.calendar;
+    const calId = calData?._id || calData?.id || calData;
+
+    const role = categories[calId]?.role;
+
+    return role === 'owner' || role === 'editor';
+  };
+
+  const handlePointerDown = e => {
+    e.stopPropagation();
+  };
+
+  const handleTaskToggleAction = (e, eventId) => {
+    e.stopPropagation();
+    toggleTaskMutation.mutate(eventId);
+  };
+
+  const handleEventClick = clickInfo => {
+    clickInfo.jsEvent.preventDefault();
+    setSelectedEvent(clickInfo.event);
+    setIsDetailsOpen(true);
+  };
+
+  const handleEditClick = event => {
+    setIsDetailsOpen(false);
+    onEventEditRequest(event);
+  };
+
+  const handleDeleteEvent = eventId => {
+    deleteEventMutation.mutate(eventId);
+    setIsDetailsOpen(false);
+  };
+
   const handleEventDrop = info => {
-    console.group('Event Dropped (Moved)');
-    console.log('Event Title:', info.event.title);
-    console.log('New Start:', info.event.startStr);
-    console.log('New End:', info.event.endStr);
-    console.log('All Day:', info.event.allDay);
-    console.groupEnd();
+    if (!checkEventPermission(info.event)) {
+      info.revert();
+      return;
+    }
+    console.log('Event Dropped:', info.event.title);
+
+    updateEventMutation.mutate({
+      eventId: info.event.id,
+      eventData: {
+        start_date: info.event.start,
+        end_date: info.event.end || info.event.start,
+        allDay: info.event.allDay,
+      },
+    });
   };
 
   const handleEventResize = info => {
-    console.group('Event Resized (Duration Changed)');
-    console.log('Event Title:', info.event.title);
-    console.log('New Start:', info.event.startStr);
-    console.log('New End:', info.event.endStr);
-    console.groupEnd();
+    if (!checkEventPermission(info.event)) {
+      info.revert();
+      return;
+    }
+    console.log('Event Resized:', info.event.title);
+
+    updateEventMutation.mutate({
+      eventId: info.event.id,
+      eventData: {
+        start_date: info.event.start,
+        end_date: info.event.end,
+      },
+    });
   };
 
   const handleDateClick = dateInfo => {
@@ -60,7 +122,6 @@ const CalendarWrapper = ({
     if (allDay) {
       const endDateObj = new Date(endStr);
       endDateObj.setDate(endDateObj.getDate() - 1);
-
       const year = endDateObj.getFullYear();
       const month = String(endDateObj.getMonth() + 1).padStart(2, '0');
       const day = String(endDateObj.getDate()).padStart(2, '0');
@@ -87,14 +148,10 @@ const CalendarWrapper = ({
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseCreateModal = () => {
     setIsModalOpen(false);
     setSelectedDate(null);
     setSelectedRange(null);
-  };
-
-  const handleCreateEvent = eventData => {
-    onCreateEvent(eventData);
   };
 
   const renderEventContent = eventInfo => {
@@ -113,30 +170,36 @@ const CalendarWrapper = ({
     return (
       <div
         className="fc-task-content"
-        onClick={e => {
-          e.stopPropagation();
-          if (!canEdit) return;
-          const currentCompleted = event.extendedProps.completed;
-          event.setExtendedProp('completed', !currentCompleted);
-        }}
-        style={{ cursor: canEdit ? 'pointer' : 'default' }}
+        style={{ cursor: 'pointer', height: '100%' }}
+        onMouseDown={e => e.preventDefault()}
       >
-        <Checkbox
-          checked={event.extendedProps.completed}
-          onChange={() => {}}
-          className="task-checkbox"
-          disabled={!canEdit}
-        />
-        <div className="fc-event-time">{eventInfo.timeText}</div>
+        <div
+          className="task-checkbox-area"
+          onPointerDown={handlePointerDown}
+          onMouseDown={handlePointerDown}
+          onClick={e => e.stopPropagation()}
+        >
+          <Checkbox
+            checked={!!event.extendedProps.done}
+            onChange={e => handleTaskToggleAction(e, event.id)}
+            className="task-checkbox"
+            disabled={false}
+          />
+        </div>
         <div
           className="fc-event-title"
           style={{
-            textDecoration: event.extendedProps.completed
-              ? 'line-through'
-              : 'none',
-            opacity: event.extendedProps.completed ? 0.7 : 1,
+            textDecoration: event.extendedProps.done ? 'line-through' : 'none',
+            opacity: event.extendedProps.done ? 0.7 : 1,
+            flex: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
+          {eventInfo.timeText && (
+            <span style={{ marginRight: 4 }}>{eventInfo.timeText}</span>
+          )}
           {event.title}
         </div>
       </div>
@@ -162,11 +225,12 @@ const CalendarWrapper = ({
         }}
         events={eventSource}
         lazyFetching={true}
-        editable={canEdit}
-        eventDurationEditable={canEdit}
-        eventStartEditable={canEdit}
+        editable={true}
+        eventDurationEditable={true}
+        eventStartEditable={true}
         eventDrop={handleEventDrop}
         eventResize={handleEventResize}
+        eventClick={handleEventClick}
         selectable={true}
         selectMirror={true}
         dayMaxEvents={1}
@@ -178,10 +242,11 @@ const CalendarWrapper = ({
         eventOverlap={true}
         eventContent={renderEventContent}
       />
+
       <EventModal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleCreateEvent}
+        onClose={handleCloseCreateModal}
+        onSubmit={onCreateEvent}
         isSubmitting={isCreatingEvent}
         initialData={{
           date: selectedDate,
@@ -190,6 +255,15 @@ const CalendarWrapper = ({
           endTime: selectedRange?.endTime,
         }}
         categories={categories}
+      />
+
+      <EventDetailsModal
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        event={selectedEvent}
+        canEdit={checkEventPermission(selectedEvent)}
+        onEdit={handleEditClick}
+        onDelete={handleDeleteEvent}
       />
     </div>
   );

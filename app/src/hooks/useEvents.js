@@ -42,3 +42,14 @@ export const useDeleteEvent = () => {
     },
   });
 };
+
+export const useToggleTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: eventsApi.toggleTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+};

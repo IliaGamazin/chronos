@@ -77,3 +77,15 @@ export const useRemoveCollaborator = () => {
     },
   });
 };
+
+export const useSendInviteEmail = () => {
+  return useMutation({
+    mutationFn: calendarsApi.sendInviteEmail,
+    onSuccess: () => {
+      console.log('Email sent successfully');
+    },
+    onError: error => {
+      console.error('Failed to send email:', error);
+    },
+  });
+};
