@@ -18,8 +18,6 @@ const ProfileSettingsPage = () => {
 
   const [avatar, setAvatar] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     login: user.login || '',
@@ -51,24 +49,23 @@ const ProfileSettingsPage = () => {
         pfp_url: avatarFile,
       });
     } catch (err) {
-      setError(err.message);
+      console.error('Avatar update failed:', err);
     }
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setIsSaving(true);
+
     try {
-      const updated = await onUpdateUser.mutateAsync({
+      await onUpdateUser.mutateAsync({
         userData: formData,
       });
+
       updateUser({ ...user, ...formData });
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response.data.error.message);
+      console.error('Profile update failed:', err);
     }
-
-    setIsSaving(false);
   };
 
   return (
@@ -85,8 +82,7 @@ const ProfileSettingsPage = () => {
           onUserAvatarChange={handleAvatarChange}
           onSubmitAvatar={applyAvatar}
           onSubmit={handleSubmit}
-          isSaving={isSaving}
-          error={error}
+          isSaving={onUpdateUser.isPending || onSetUserAvatar.isPending}
         />
       </div>
     </div>

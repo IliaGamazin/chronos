@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import CustomInput from '@/shared/CustomInput';
 import CustomButton from '@/shared/CustomButton';
-import { formatErrorMessage } from '@/utils/errorUtils';
 import styles from './AuthForm.module.css';
 import Logo from '@/shared/Logo/Logo.jsx';
 
@@ -13,7 +12,6 @@ const AuthForm = ({
   onSubmit,
   isLoading,
   footer,
-  error,
 }) => {
   const [formData, setFormData] = useState(
     fields.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {})
@@ -37,15 +35,7 @@ const AuthForm = ({
       <div className={styles.authFormCard}>
         <h1 className={styles.title}>{title}</h1>
 
-        {error && (
-          <div className={styles.error}>
-            {typeof error === 'string'
-              ? error
-              : error?.message ||
-                formatErrorMessage(error) ||
-                'An error occurred'}
-          </div>
-        )}
+        {/* УДАЛЕН БЛОК ОТОБРАЖЕНИЯ ОШИБОК */}
 
         <form onSubmit={handleSubmit} className={styles.form}>
           {fields.map(field => (

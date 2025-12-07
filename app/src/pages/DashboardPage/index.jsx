@@ -28,11 +28,7 @@ import './DashboardPage.css';
 const DashboardPage = () => {
   const { user } = useAuthContext();
 
-  const {
-    data: calendarsData,
-    isLoading: calendarsLoading,
-    error: calendarsError,
-  } = useCalendars();
+  const { data: calendarsData, isLoading: calendarsLoading } = useCalendars();
 
   const calendarIds =
     calendarsData?.data?.map(cal => cal.id || cal._id).filter(Boolean) || [];
@@ -41,11 +37,7 @@ const DashboardPage = () => {
   const fromDate = new Date(now.getFullYear() - 5, 0, 1).toISOString();
   const toDate = new Date(now.getFullYear() + 5, 0, 1).toISOString();
 
-  const {
-    data: eventsData,
-    isLoading: eventsLoading,
-    error: eventsError,
-  } = useEvents({
+  const { data: eventsData, isLoading: eventsLoading } = useEvents({
     calendars: calendarIds,
     from: fromDate,
     to: toDate,
@@ -212,12 +204,6 @@ const DashboardPage = () => {
     return (
       <div className="dashboard">
         <div className="loading-message">Loading...</div>
-      </div>
-    );
-  if (calendarsError)
-    return (
-      <div className="dashboard">
-        <div className="error-message">Error: {calendarsError.message}</div>
       </div>
     );
 

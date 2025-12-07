@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarsApi } from '@/api/calendarsApi';
 import { getUserLocale } from '@/utils/localeUtils';
+import toast from 'react-hot-toast';
 
 export const useCalendars = filters => {
   const locale = getUserLocale();
@@ -18,6 +19,12 @@ export const useCreateCalendar = () => {
     mutationFn: calendarsApi.createCalendar,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
+      toast.success('Calendar created successfully.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to create calendar.';
+      toast.error(message);
     },
   });
 };
@@ -26,8 +33,16 @@ export const useCreateInvite = () => {
   return useMutation({
     mutationKey: ['createInvite'],
     mutationFn: calendarsApi.invite,
+    onSuccess: () => {
+      toast.success('Invite token generated.', { id: 'inviteGen' });
+    },
     onError: error => {
-      console.error('Failed to generate invite token:', error);
+      const message =
+        error.response?.data?.error?.message || 'Failed to generate invite.';
+      toast.error(message, { id: 'inviteGen' });
+    },
+    onMutate: () => {
+      toast.loading('Generating invite link...', { id: 'inviteGen' });
     },
   });
 };
@@ -39,6 +54,12 @@ export const useUpdateCalendar = () => {
     mutationFn: calendarsApi.updateCalendar,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
+      toast.success('Calendar settings updated successfully.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to update calendar.';
+      toast.error(message);
     },
   });
 };
@@ -51,6 +72,12 @@ export const useDeleteCalendar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast.success('Calendar deleted.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to delete calendar.';
+      toast.error(message);
     },
   });
 };
@@ -73,6 +100,12 @@ export const useUnfollowCalendar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast.success('Successfully unfollowed calendar.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to unfollow calendar.';
+      toast.error(message);
     },
   });
 };
@@ -84,6 +117,13 @@ export const useRemoveCollaborator = () => {
     mutationFn: calendarsApi.removeCollaborator,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
+      toast.success('Collaborator removed.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message ||
+        'Failed to remove collaborator.';
+      toast.error(message);
     },
   });
 };
@@ -92,10 +132,16 @@ export const useSendInviteEmail = () => {
   return useMutation({
     mutationFn: calendarsApi.sendInviteEmail,
     onSuccess: () => {
-      console.log('Email sent successfully');
+      toast.success('Invitation email sent successfully.', { id: 'emailSend' });
     },
     onError: error => {
-      console.error('Failed to send email:', error);
+      const message =
+        error.response?.data?.error?.message ||
+        'Failed to send invitation email.';
+      toast.error(message, { id: 'emailSend' });
+    },
+    onMutate: () => {
+      toast.loading('Sending invitation email...', { id: 'emailSend' });
     },
   });
 };

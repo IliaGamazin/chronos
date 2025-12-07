@@ -3,14 +3,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 import CustomButton from '@/shared/CustomButton';
-import Header from '@/components/Header/Header.jsx';
+import DashboardHeader from '@/components/Header/Header.jsx';
 
 import './ProfilePage.css';
 
-const ProfilePage = () => {
-  const { user } = useAuthContext();
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+const ProfileAvatar = ({ user }) => {
+  if (!user) return null;
 
   const getInitials = name => {
     if (!name) return '?';
@@ -23,19 +21,29 @@ const ProfilePage = () => {
   };
 
   return (
+    <div className="profile-avatar">
+      {user?.pfp_url ? (
+        <img src={user.pfp_url} alt="Profile" />
+      ) : (
+        <span>{getInitials(user?.full_name)}</span>
+      )}
+    </div>
+  );
+};
+
+const ProfilePage = () => {
+  const { user } = useAuthContext();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  return (
     <div className="profile-page">
       <div className="profile-container">
-        <Header hideAvatar={true} />
+        <DashboardHeader hideAvatar={true} />
 
         <div className="profile-content">
           <div className="profile-card">
-            <div className="profile-avatar">
-              {user?.pfp_url ? (
-                <img src={user.pfp_url} alt="Profile" />
-              ) : (
-                <span>{getInitials(user?.full_name)}</span>
-              )}
-            </div>
+            <ProfileAvatar user={user} />
 
             <h2 className="profile-name">{user?.full_name}</h2>
             <p className="profile-username">@{user?.login}</p>

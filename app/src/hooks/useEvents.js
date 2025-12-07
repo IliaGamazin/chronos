@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventsApi } from '@/api/eventsApi';
+import toast from 'react-hot-toast';
 
 export const useEvents = filters => {
   return useQuery({
@@ -17,6 +18,12 @@ export const useCreateEvent = () => {
     mutationFn: eventsApi.createEvent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast.success('Event created successfully.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to create event.';
+      toast.error(message);
     },
   });
 };
@@ -28,6 +35,12 @@ export const useUpdateEvent = () => {
     mutationFn: eventsApi.updateEvent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast.success('Event updated successfully.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to update event.';
+      toast.error(message);
     },
   });
 };
@@ -40,6 +53,12 @@ export const useDeleteEvent = () => {
     mutationFn: eventsApi.deleteEvent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast.success('Event deleted.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to delete event.';
+      toast.error(message);
     },
   });
 };
@@ -51,6 +70,15 @@ export const useToggleTask = () => {
     mutationFn: eventsApi.toggleTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast.success('Task status updated.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to update task status.';
+      toast.error(message);
+    },
+    onMutate: () => {
+      toast.loading('Updating task status...', { id: 'toggleTask' });
     },
   });
 };

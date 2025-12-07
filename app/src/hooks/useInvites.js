@@ -1,12 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { invitesApi } from '@/api/invitesApi';
+import toast from 'react-hot-toast';
 
 export const useCreateInvite = () => {
   return useMutation({
     mutationFn: invitesApi.createInvite,
-    onError: (error) => {
-      console.error('Failed to create invite:', error);
-    }
+    onSuccess: () => {
+      toast.success('Invite created successfully.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to create invite.';
+      toast.error(message);
+    },
   });
 };
 
@@ -25,6 +31,12 @@ export const useAcceptInvite = () => {
     mutationFn: invitesApi.acceptInvite,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
+      toast.success('Invitation accepted. Calendar added!');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to accept invitation.';
+      toast.error(message);
     },
   });
 };
@@ -36,6 +48,12 @@ export const useDeclineInvite = () => {
     mutationFn: invitesApi.declineInvite,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['calendars'] });
-    }
+      toast.success('Invitation declined.');
+    },
+    onError: error => {
+      const message =
+        error.response?.data?.error?.message || 'Failed to decline invitation.';
+      toast.error(message);
+    },
   });
 };
