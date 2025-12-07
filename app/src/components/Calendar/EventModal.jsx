@@ -89,6 +89,17 @@ const EventModal = ({
     };
 
     if (formData.type === 'task' || formData.type === 'fullday') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const selected = new Date(formData.date);
+      selected.setHours(0, 0, 0, 0);
+
+      if (selected < today) {
+        alert('Cannot create events in the past');
+        return;
+      }
+
       eventData.start_date = formData.date;
       eventData.end_date = formData.date;
     } else if (formData.type === 'arrangement') {
