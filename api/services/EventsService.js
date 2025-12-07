@@ -140,7 +140,7 @@ class EventsService {
     async toggle_task(event_id) {
         const event = await Event.findById(event_id);
         if (!event) {
-            throw new NotFoundError("Event id not found");
+            throw new NotFoundError("No event with id");
         }
 
         if (event.type !== "task") {
@@ -149,6 +149,32 @@ class EventsService {
 
         event.done = !event.done;
         await event.save();
+    }
+
+    async delete_event(user_id, event_id) {
+        const event = await Event.findById(event_id);
+        if (!event) {
+            throw new NotFoundError("No event with id");
+        }
+
+        const user = await User.findById(user_id);
+        if (!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        const calendar = await Calendar.findById(event.calendar.toString());
+        if (!calendar) {
+            throw new NotFoundError("No calendar with id");
+        }
+
+        const is_author = calendar.author.toString() === user_id.toString();
+        const is_editor = calendar.editors.some(id => id.toString() === user_id.toString());
+
+        if (!is_author && !is_editor) {
+            throw new ForbiddenError("Insufficient permissions");
+        }
+
+        await Event.findByIdAndDelete(event_id);
     }
 
     async get_event() {
