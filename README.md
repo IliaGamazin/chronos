@@ -30,4 +30,5 @@ Start all services together using Docker:
 docker compose up -d --build
 ```
 
+
 > **Note:** For routine restarts, the `--build` flag can be omitted.
